@@ -18,9 +18,6 @@ iOS版微信抢红包插件 tweak源文件
 - 手机锁屏情况演示</br>
   ![image](https://github.com/kevll/WeChatRedEnvelopesHelper/blob/master/screenshots/lockscreenstatus.gif)
 
-- 助手配置截图</br>
-  <img src="https://github.com/kevll/WeChatRedEnvelopesHelper/raw/master/screenshots/step.png" style="zoom:20%;">
-
 ## How to install
 
 - 越狱手机
@@ -30,9 +27,12 @@ iOS版微信抢红包插件 tweak源文件
 - 非越狱手机
     1. 下载已打包好的ipa，使用impactor工具自行安装 （推荐）</br>
       ![image](https://github.com/kevll/WeChatRedEnvelopesHelper/blob/master/screenshots/stepone.gif)</br>
-      ![image](https://github.com/kevll/WeChatRedEnvelopesHelper/blob/master/screenshots/steptwo.gif)
-      ![image](https://github.com/kevll/WeChatRedEnvelopesHelper/blob/master/screenshots/stepthree.gif)</br>
+      ![image](https://github.com/kevll/WeChatRedEnvelopesHelper/blob/master/screenshots/steptwo.gif)</br>
     2. 从XX助手上面下载越狱版ipa --> 解压缩 --> 拷贝WeChatRedEnvelopesHelper.dylib和libsubstate.dylib到Frameworks目录 --> 向WeChat二进制文件注入dylib -> 更改 WeChatRedEnvelopesHelper.dylib 依赖 --> 打包重签名安装
+
+## How to Setting
+前往微信 “设置” —-> “微信助手设置” —-> 开启助手并保存</br>
+![image](https://github.com/kevll/WeChatRedEnvelopesHelper/blob/master/screenshots/stepthree.gif)
 
 ## Hope
 
