@@ -18,6 +18,10 @@ iOS版微信抢红包插件 tweak源文件
 - 手机锁屏情况演示</br>
   ![image](https://github.com/kevll/WeChatRedEnvelopesHelper/blob/master/screenshots/lockscreenstatus.gif)
 
+- 高清演示视频</br>
+[优酷链接](http://v.youku.com/v_show/id_XMzI3NDI3MzE2NA==.html)</br>
+[youtube链接](https://www.youtube.com/watch?v=cZH16LGaOko)
+
 ## How to install
 
 - 越狱手机
