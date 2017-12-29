@@ -19,8 +19,8 @@ iOS版微信抢红包插件 tweak源文件
   ![image](https://github.com/kevll/WeChatRedEnvelopesHelper/blob/master/screenshots/lockscreenstatus.gif)
 
 - 高清演示视频</br>
-[优酷链接](http://v.youku.com/v_show/id_XMzI3NDI3MzE2NA==.html)</br>
-[youtube链接](https://www.youtube.com/watch?v=cZH16LGaOko)
+  [优酷链接](http://v.youku.com/v_show/id_XMzI3NDI3MzE2NA==.html)</br>
+  [youtube链接](https://www.youtube.com/watch?v=cZH16LGaOko)
 
 ## How to install
 
@@ -29,7 +29,8 @@ iOS版微信抢红包插件 tweak源文件
     2.  clone到本地，手动 make package install
 
 - 非越狱手机
-    1. 下载已打包好的ipa，使用impactor工具自行安装 （推荐）</br>
+    1. 下载已打包好的[ipa](https://github.com/kevll/WeChatRedEnvelopesHelper/blob/master/ipa/WeChat-kevll.ipa)，使用[impactor](http://www.cydiaimpactor.com/)工具自行安装 （推荐）</br>
+        ipa百度网盘[下载链接](https://pan.baidu.com/s/1o8mmMG6)  密码: vh18 </br>
       ![image](https://github.com/kevll/WeChatRedEnvelopesHelper/blob/master/screenshots/stepone.gif)</br>
       ![image](https://github.com/kevll/WeChatRedEnvelopesHelper/blob/master/screenshots/steptwo.gif)</br>
     2. 从XX助手上面下载越狱版ipa --> 解压缩 --> 拷贝WeChatRedEnvelopesHelper.dylib和libsubstate.dylib到Frameworks目录 --> 向WeChat二进制文件注入dylib -> 更改 WeChatRedEnvelopesHelper.dylib 依赖 --> 打包重签名安装
