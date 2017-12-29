@@ -70,7 +70,7 @@
 
 - (void)setDelegate:(id)delegate;
 - (id)initWithFrame:(CGRect)frame style:(UITableViewStyle)style;
-- (id)getTableView;
+- (MMTableView *)getTableView;
 - (void)clearAllSection;
 - (void)addSection:(id)arg1;
 - (void)insertSection:(id)arg1 At:(unsigned int)arg2;
