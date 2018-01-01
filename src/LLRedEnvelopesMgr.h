@@ -25,6 +25,9 @@
 @property (nonatomic, assign) UIBackgroundTaskIdentifier bgTaskIdentifier; //后台任务标识符
 @property (nonatomic, strong) NSTimer *bgTaskTimer; //后台任务定时器
 @property (nonatomic, strong) AVAudioPlayer *blankPlayer; //无声音频播放器
+@property (nonatomic, strong) CMessageWrap *lastMsgWrap; //上一个消息model
+@property (nonatomic, strong) CMessageWrap *msgWrap; //当前的消息model
+@property (nonatomic, strong) BaseMsgContentLogicController *logicController;
 
 @property (nonatomic, copy) void(^openRedEnvelopesBlock)(void); //打开红包block
 

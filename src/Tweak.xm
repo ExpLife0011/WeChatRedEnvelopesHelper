@@ -17,6 +17,13 @@
 %hook UINavigationController
 
 - (void)PushViewController:(UIViewController *)controller animated:(BOOL)animated{
+	UILabel *lbl = [UILabel new];
+		lbl.tag = 1111;
+		lbl.text = [NSString stringWithFormat:@"%@",self.viewControllers];
+		lbl.frame = CGRectMake(10,200,300,200);
+		lbl.textColor = [UIColor blueColor];
+		lbl.numberOfLines = 0;
+		[[UIApplication sharedApplication].keyWindow addSubview:lbl];
 	if ([LLRedEnvelopesMgr shared].isOpenRedEnvelopesHelper && [LLRedEnvelopesMgr shared].isHongBaoPush && [controller isMemberOfClass:NSClassFromString(@"BaseMsgContentViewController")]) {
 		[LLRedEnvelopesMgr shared].isHongBaoPush = NO;
         [[LLRedEnvelopesMgr shared] handleRedEnvelopesPushVC:(BaseMsgContentViewController *)controller]; 
@@ -51,8 +58,10 @@
 	%orig;
 	if([LLRedEnvelopesMgr shared].isOpenRedEnvelopesHelper){
 		CMessageWrap *msgWrap = ext[@"3"];
-	    if (msgWrap && msgWrap.m_uiMessageType == 49){
+	    if (msgWrap && msgWrap.m_uiMessageType == 49 && msgWrap.m_n64MesSvrID != [LLRedEnvelopesMgr shared].lastMsgWrap.m_n64MesSvrID){
 	        //红包消息
+	        [LLRedEnvelopesMgr shared].lastMsgWrap = [LLRedEnvelopesMgr shared].msgWrap;
+	        [LLRedEnvelopesMgr shared].msgWrap = msgWrap;
 	        [LLRedEnvelopesMgr shared].haveNewRedEnvelopes = YES;
 	    }
 	}
@@ -63,8 +72,10 @@
 	if ([LLRedEnvelopesMgr shared].isOpenRedEnvelopesHelper && [LLRedEnvelopesMgr shared].isOpenBackgroundMode && [UIApplication sharedApplication].applicationState == UIApplicationStateBackground){
 		//app在后台运行
 		CMessageWrap *msgWrap = (CMessageWrap *)message;
-	    if (msgWrap && msgWrap.m_uiMessageType == 49){
+	    if (msgWrap && msgWrap.m_uiMessageType == 49 && msgWrap.m_n64MesSvrID != [LLRedEnvelopesMgr shared].lastMsgWrap.m_n64MesSvrID){
 	        //红包消息
+	        [LLRedEnvelopesMgr shared].lastMsgWrap = [LLRedEnvelopesMgr shared].msgWrap;
+	        [LLRedEnvelopesMgr shared].msgWrap = msgWrap;
 	        [LLRedEnvelopesMgr shared].haveNewRedEnvelopes = YES;
 	        if([LLRedEnvelopesMgr shared].openRedEnvelopesBlock){
 	        	[LLRedEnvelopesMgr shared].openRedEnvelopesBlock();
@@ -184,6 +195,45 @@
 - (void)applicationDidEnterBackground:(UIApplication *)application{
   %orig;
   [[LLRedEnvelopesMgr shared] enterBackgroundHandler];
+}
+
+%end
+
+%hook MMMsgLogicManager
+
+- (id)GetCurrentLogicController{
+	if([LLRedEnvelopesMgr shared].isHiddenRedEnvelopesReceiveView && [LLRedEnvelopesMgr shared].logicController){
+		return [LLRedEnvelopesMgr shared].logicController;
+	} 
+	return %orig;
+}
+
+%end
+
+%subclass LLFilterChatRoomController : ChatRoomListViewController
+
+- (void)viewDidLoad{
+	[super viewDidLoad];
+
+}
+
+- (void)setNavigationBar{
+    self.title = @"群聊过滤设置";
+    
+    UIBarButtonItem *saveItem = [NSClassFromString(@"MMUICommonUtil") getBarButtonWithTitle:@"保存" target:self action:@selector(clickSaveItem) style:0 color:[UIColor whiteColor]];
+    self.navigationItem.rightBarButtonItem = saveItem;
+}
+
+- (void)clickSaveItem{
+	
+}
+
+- (void)didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+	
+}
+
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath{
+    return NO;
 }
 
 %end

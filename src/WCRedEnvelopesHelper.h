@@ -1,7 +1,18 @@
+@interface WCPayInfoItem: NSObject
+- (NSString *)m_nsPayMsgID;
+@end
 @interface CMessageWrap : NSObject
 
 @property(nonatomic) unsigned int m_uiMessageType; // @synthesize m_uiMessageType;
 @property(retain, nonatomic) NSString *m_nsContent; // @synthesize m_nsContent;
+@property(nonatomic) long long m_n64MesSvrID; // @synthesize m_n64MesSvrID;
+@property(nonatomic) unsigned int m_uiMesLocalID; // @synthesize m_uiMesLocalID;
+@property(nonatomic) unsigned int m_uiCreateTime; // @synthesize m_uiCreateTime;
+@property(retain, nonatomic) NSString *m_nsFromUsr; // @synthesize m_nsFromUsr;
+@property(retain, nonatomic) NSString *m_nsToUsr; // @synthesize m_nsToUsr;
+
+- (WCPayInfoItem *)m_oWCPayInfoItem;
+- (id)nativeUrl;
 
 @end
 
@@ -12,9 +23,17 @@
 @property(nonatomic) unsigned int m_uiSex; // @synthesize m_uiSex;
 @property(retain, nonatomic) NSString *m_nsHeadImgUrl; // @synthesize m_nsHeadImgUrl;
 
+- (_Bool)isEqualToContact:(id)arg1;
+
 @end
 
 @interface CContact: CBaseContact
+
+@end
+
+@interface CContactMgr: NSObject
+
+- (id)getContactByName:(id)arg1;
 
 @end
 
@@ -33,6 +52,7 @@
 - (id)tableView:(id)arg1 cellForRowAtIndexPath:(id)arg2;
 - (long long)numberOfSectionsInTableView:(id)arg1;
 - (void)tapAppNodeView:(id)arg1;
+- (CContact *)getChatContact;
 
 @end
 
@@ -114,5 +134,73 @@
 @interface MMWebViewController : UIViewController
 
 - (id)initWithURL:(NSURL *)url presentModal:(BOOL)presentModal extraInfo:(id)extraInfo delegate:(id)delegate;
+
+@end
+
+@interface WCRedEnvelopesControlData: NSObject
+
+- (void)setM_oSelectedMessageWrap:(CMessageWrap *)msgWrap;
+
+@end
+
+@interface MMServiceCenter 
+
++ (id)defaultCenter;
+- (id)getService:(Class)aClass;
+
+@end
+
+@interface WCRedEnvelopesControlMgr: NSObject 
+
+- (void)startReceiveRedEnvelopesLogic:(UIViewController *)controller Data:(WCRedEnvelopesControlData *)data;
+
+@end
+
+@interface BaseMsgContentLogicController: NSObject
+
+- (id)initWithLocalID:(unsigned int)arg1 CreateTime:(unsigned int)arg2 ContentViewDisshowStatus:(int)arg3;
+- (BaseMsgContentViewController *)getViewController;
+- (void)setM_contact:(CContact *)contact;
+- (void)setM_dicExtraInfo:(id)info;
+- (void)onWillEnterRoom;
+- (id)getMsgContentViewController;
+
+@end
+
+@interface MemberDataLogic: NSObject
+
+- (id)initWithMemberList:(id)arg1 admin:(id)arg2;
+
+@end
+
+@protocol ContactsDataLogicDelegate <NSObject>
+- (_Bool)onFilterContactCandidate:(CContact *)arg1;
+- (void)onContactsDataChange;
+
+@optional
+- (void)onContactAsynSearchSectionResultChanged:(NSArray *)arg1 sectionTitles:(NSDictionary *)arg2 sectionResults:(NSDictionary *)arg3;
+- (void)onContactsDataNeedChange;
+@end
+
+@interface ContactsDataLogic: NSObject
+
+- (id)initWithScene:(unsigned int)arg1 delegate:(id)arg2 sort:(_Bool)arg3 extendChatRoom:(_Bool)arg4;
+- (id)getChatRoomContacts;
+
+@end
+
+@interface ChatRoomListViewController: UIViewController
+
+- (void)setMemberLogic:(MemberDataLogic *)logic;
+
+@end
+
+@interface LLFilterChatRoomController: ChatRoomListViewController
+
+@end
+
+@interface CAppViewControllerManager: NSObject
+
++ (UITabBarController *)getTabBarController;
 
 @end

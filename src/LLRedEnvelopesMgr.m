@@ -126,33 +126,26 @@ static NSString * const wantSportStepCountKey = @"wantSportStepCountKey";
 
 - (void)handleRedEnvelopesPushVC:(BaseMsgContentViewController *)baseMsgVC{
     //红包push
-    if (!baseMsgVC.view){
-        [self reset];
-        return;
-    }
-    
-    UITableView *tableView = [baseMsgVC valueForKey:@"m_tableView"];
-    
-    NSInteger section = [baseMsgVC numberOfSectionsInTableView:tableView] - 1;
-    
-    if(section < 0){
-        [self reset];
-        return;
-    }
-
-    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:section];
-    UITableViewCell *cell = [baseMsgVC tableView:tableView cellForRowAtIndexPath:indexPath];
-    
-    UIView *payC2CView = nil;
-    for (UIView *subView in [cell.contentView subviews]) {
-        if ([subView isKindOfClass:NSClassFromString(@"WCPayC2CMessageCellView")]) {
-            payC2CView = subView;
-            break;
+    if(![[self.msgWrap nativeUrl] containsString:@"weixin://openNativeUrl/weixinHB/startreceivebizhbrequest?"] && [[self.msgWrap m_oWCPayInfoItem] m_nsPayMsgID].length){
+        CContactMgr *contactMgr = [[NSClassFromString(@"MMServiceCenter") defaultCenter] getService:NSClassFromString(@"CContactMgr")];
+        CContact *fromContact = [contactMgr getContactByName:self.msgWrap.m_nsFromUsr];
+        if(![[baseMsgVC getChatContact] isEqualToContact:fromContact]){
+            BaseMsgContentLogicController *logicController = [[NSClassFromString(@"BaseMsgContentLogicController") alloc] initWithLocalID:self.msgWrap.m_uiMesLocalID CreateTime:self.msgWrap.m_uiCreateTime ContentViewDisshowStatus:0x4];
+            [logicController setM_contact:fromContact];
+            [logicController setM_dicExtraInfo:nil];
+            [logicController onWillEnterRoom];
+            self.logicController = logicController;
+            baseMsgVC = [logicController getMsgContentViewController];
+        } else {
+            self.logicController = nil;
         }
-    }
-    if(payC2CView){
-        self.isHiddenRedEnvelopesReceiveView = YES;
-        [baseMsgVC tapAppNodeView:payC2CView];
+        WCRedEnvelopesControlData *data = [[NSClassFromString(@"WCRedEnvelopesControlData") alloc] init];
+        [data setM_oSelectedMessageWrap:self.msgWrap];
+        WCRedEnvelopesControlMgr *controlMgr = [[NSClassFromString(@"MMServiceCenter") defaultCenter] getService:NSClassFromString(@"WCRedEnvelopesControlMgr")];
+        //if(baseMsgVC.view){
+            self.isHiddenRedEnvelopesReceiveView = YES;
+            [controlMgr startReceiveRedEnvelopesLogic:baseMsgVC Data:data];                
+        //}
     }
 }
 
