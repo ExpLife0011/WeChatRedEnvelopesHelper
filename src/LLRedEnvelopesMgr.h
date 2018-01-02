@@ -28,12 +28,16 @@
 @property (nonatomic, strong) CMessageWrap *lastMsgWrap; //上一个消息model
 @property (nonatomic, strong) CMessageWrap *msgWrap; //当前的消息model
 @property (nonatomic, strong) BaseMsgContentLogicController *logicController;
+@property (nonatomic, strong) NSMutableDictionary *filterRoomDic; //过滤群组字典
 
 @property (nonatomic, copy) void(^openRedEnvelopesBlock)(void); //打开红包block
 
 + (LLRedEnvelopesMgr *)shared;
 
 - (void)reset;
+
+//判断是否抢红包
+- (BOOL)isSnatchRedEnvelopes:(CMessageWrap *)msgWrap;
 
 - (void)openRedEnvelopes:(NewMainFrameViewController *)mainVC;
 

@@ -14,6 +14,7 @@ static NSString * const isOpenBackgroundModeKey = @"isOpenBackgroundModeKey";
 static NSString * const isOpenRedEnvelopesAlertKey = @"isOpenRedEnvelopesAlertKey";
 static NSString * const openRedEnvelopesDelaySecondKey = @"openRedEnvelopesDelaySecondKey";
 static NSString * const wantSportStepCountKey = @"wantSportStepCountKey"; 
+static NSString * const filterRoomDicKey = @"filterRoomDicKey";
 
 @implementation LLRedEnvelopesMgr
 
@@ -34,6 +35,7 @@ static NSString * const wantSportStepCountKey = @"wantSportStepCountKey";
         _isOpenRedEnvelopesAlert = [[NSUserDefaults standardUserDefaults] boolForKey:isOpenRedEnvelopesAlertKey];
         _openRedEnvelopesDelaySecond = [[NSUserDefaults standardUserDefaults] floatForKey:openRedEnvelopesDelaySecondKey];
         _wantSportStepCount = [[NSUserDefaults standardUserDefaults] integerForKey:wantSportStepCountKey];
+        _filterRoomDic = [[NSUserDefaults standardUserDefaults] objectForKey:filterRoomDicKey];
     }
     return self;
 }
@@ -104,6 +106,20 @@ static NSString * const wantSportStepCountKey = @"wantSportStepCountKey";
     _wantSportStepCount = wantSportStepCount;
     [[NSUserDefaults standardUserDefaults] setInteger:wantSportStepCount forKey:wantSportStepCountKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (void)setFilterRoomDic:(NSMutableDictionary *)filterRoomDic{
+    _filterRoomDic = filterRoomDic;
+    [[NSUserDefaults standardUserDefaults] setObject:filterRoomDic forKey:filterRoomDicKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+//判断是否抢红包
+- (BOOL)isSnatchRedEnvelopes:(CMessageWrap *)msgWrap{
+    if(_filterRoomDic && _filterRoomDic[msgWrap.m_nsFromUsr]){
+        return NO; //过滤群组
+    }
+    return YES;
 }
 
 #pragma mark HANDLER METHOD

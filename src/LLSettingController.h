@@ -16,6 +16,7 @@
 @property (nonatomic, assign) BOOL isOpenRedEnvelopesAlert; //是否打卡红包提醒
 @property (nonatomic, assign) CGFloat openRedEnvelopesDelaySecond; //打开红包延迟时间
 @property (nonatomic, assign) NSInteger wantSportStepCount; //想要的运动步数
+@property (nonatomic, strong) NSMutableDictionary *filterRoomDic; //过滤群组字典
 
 @end
 

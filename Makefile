@@ -5,7 +5,7 @@ include $(THEOS)/makefiles/common.mk
 SRC = $(wildcard src/*.m)
 
 TWEAK_NAME = WeChatRedEnvelopesHelper
-WeChatRedEnvelopesHelper_FILES = $(wildcard src/*.m) src/Tweak.xm
+WeChatRedEnvelopesHelper_FILES = $(wildcard src/*.m) $(wildcard src/*.xm)
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 

@@ -80,6 +80,8 @@
 
 @interface MMTableView: UITableView
 
+- (void)setTableHeaderView:(UIView *)view;
+
 @end
 
 @interface MMUIViewController : UIViewController
@@ -94,6 +96,7 @@
 - (void)clearAllSection;
 - (void)addSection:(id)arg1;
 - (void)insertSection:(id)arg1 At:(unsigned int)arg2;
+- (void)clearAllSection;
 
 @end
 
@@ -170,6 +173,10 @@
 @interface MemberDataLogic: NSObject
 
 - (id)initWithMemberList:(id)arg1 admin:(id)arg2;
+- (CContact *)getItemInSection:(unsigned long long)arg1 atRow:(unsigned long long)arg2;
+- (unsigned long long)getSectionItemCount:(unsigned long long)arg1;
+- (unsigned long long)getSectionCount;
+- (unsigned long long)getTotalCount;
 
 @end
 
@@ -189,13 +196,23 @@
 
 @end
 
-@interface ChatRoomListViewController: UIViewController
+@interface MemberListViewController: UIViewController
+
+@end
+
+@interface ChatRoomListViewController: MemberListViewController
 
 - (void)setMemberLogic:(MemberDataLogic *)logic;
 
 @end
 
 @interface LLFilterChatRoomController: ChatRoomListViewController
+
+@property (nonatomic, strong) NSMutableDictionary *filterRoomDic; //过滤群组字典
+@property (nonatomic, copy) void (^onConfirmSelectFilterRoom)(NSMutableDictionary *filterRoomDic);
+
+- (void)setNavigationBar;
+- (void)commonInit;
 
 @end
 

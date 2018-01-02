@@ -19,6 +19,8 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
 
 @property (nonatomic, strong) ContactsDataLogic *contactsDataLogic;
 
+@property (nonatomic, strong) MMTableViewInfo *tableViewInfo;
+
 @end
 
 @implementation LLSettingParam
@@ -31,7 +33,7 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     [super viewDidLoad];
     [self commonInit];
     [self setNavigationBar];
-    [self exchangeMethod];
+    [self setTableView];
     [self reloadTableData];
 }
 
@@ -43,8 +45,11 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     _settingParam.isOpenRedEnvelopesAlert = [LLRedEnvelopesMgr shared].isOpenRedEnvelopesAlert;
     _settingParam.openRedEnvelopesDelaySecond = [LLRedEnvelopesMgr shared].openRedEnvelopesDelaySecond;
     _settingParam.wantSportStepCount = [LLRedEnvelopesMgr shared].wantSportStepCount;
+    _settingParam.filterRoomDic = [LLRedEnvelopesMgr shared].filterRoomDic;
 
     _contactsDataLogic = [[NSClassFromString(@"ContactsDataLogic") alloc] initWithScene:0x0 delegate:nil sort:0x1 extendChatRoom:0x0];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onConfirmFilterChatRoom:) name:@"kConfirmFilterChatRoomNotification" object:nil];
 }
 
 - (void)setNavigationBar{
@@ -58,19 +63,23 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     method_exchangeImplementations(class_getInstanceMethod(NSClassFromString(@"MMTableViewCellInfo"), @selector(actionEditorCell:)), class_getInstanceMethod([LLSettingController class], @selector(onTextFieldEditChanged:)));
 }
 
-- (void)reloadTableData{
-    MMTableViewInfo *tableInfo = [[NSClassFromString(@"MMTableViewInfo") alloc] initWithFrame:[UIScreen mainScreen].bounds style:0];
-    [self.view addSubview:[tableInfo getTableView]];
-    [tableInfo setDelegate:self];
+- (void)setTableView{
+    _tableViewInfo = [[NSClassFromString(@"MMTableViewInfo") alloc] initWithFrame:[UIScreen mainScreen].bounds style:0];
+    [self.view addSubview:[_tableViewInfo getTableView]];
+    [_tableViewInfo setDelegate:self];
     if (@available(iOS 11, *)) {         
-        [tableInfo getTableView].contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentAlways;             
+        [_tableViewInfo getTableView].contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentAlways;             
+    }else{
+        self.automaticallyAdjustsScrollViewInsets = YES;
     }
-    
+}
+
+- (void)reloadTableData{
     MMTableViewCellInfo *openRedEnvelopesCell = [NSClassFromString(@"MMTableViewCellInfo") switchCellForSel:@selector(openRedEnvelopesSwitchHandler:) target:self title:@"是否开启红包助手" on:_settingParam.isOpenRedEnvelopesHelper];
     MMTableViewCellInfo *backgroundModeCell = [NSClassFromString(@"MMTableViewCellInfo") switchCellForSel:@selector(openBackgroundMode:) target:self title:@"是否开启后台模式" on:_settingParam.isOpenBackgroundMode];
     MMTableViewCellInfo *openAlertCell = [NSClassFromString(@"MMTableViewCellInfo") switchCellForSel:@selector(openRedEnvelopesAlertHandler:) target:self title:@"是否开启红包提醒" on:_settingParam.isOpenRedEnvelopesAlert];
     MMTableViewCellInfo *delayTimeCell = [NSClassFromString(@"MMTableViewCellInfo") editorCellForSel:nil target:nil title:@"延迟秒数" margin:120 tip:@"请输入延迟抢红包秒数" focus:NO autoCorrect:NO text:[NSString stringWithFormat:@"%.2f",_settingParam.openRedEnvelopesDelaySecond] isFitIpadClassic:YES];
-    MMTableViewCellInfo *filterRoomCell = [NSClassFromString(@"MMTableViewCellInfo") normalCellForSel:@selector(onfilterRoomCellClicked) target:self title:@"过滤群聊" rightValue:@"选择过滤的群聊" accessoryType:1];
+    MMTableViewCellInfo *filterRoomCell = [NSClassFromString(@"MMTableViewCellInfo") normalCellForSel:@selector(onfilterRoomCellClicked) target:self title:@"过滤群聊" rightValue:self.settingParam.filterRoomDic.count?[NSString stringWithFormat:@"已选%ld个群聊",(long)self.settingParam.filterRoomDic.count]:@"暂未选择" accessoryType:1];
     [delayTimeCell addUserInfoValue:@(UIKeyboardTypeDecimalPad) forKey:@"keyboardType"];
     [delayTimeCell addUserInfoValue:@"delayTimeCell" forKey:@"cellType"];
     objc_setAssociatedObject(delayTimeCell, &kSettingControllerKey, self, OBJC_ASSOCIATION_ASSIGN);
@@ -99,11 +108,13 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     MMTableViewSectionInfo *aboutMeSection = [NSClassFromString(@"MMTableViewSectionInfo") sectionInfoDefaut];
     [aboutMeSection addCell:githubCell];
     
-    [tableInfo addSection:redEnvelopesSection];
-    [tableInfo addSection:stepCountSection];
-    [tableInfo addSection:aboutMeSection];
+    [_tableViewInfo clearAllSection];
+
+    [_tableViewInfo addSection:redEnvelopesSection];
+    [_tableViewInfo addSection:stepCountSection];
+    [_tableViewInfo addSection:aboutMeSection];
     
-    [[tableInfo getTableView] reloadData];
+    [[_tableViewInfo getTableView] reloadData];
 }
 
 //点击保存
@@ -114,6 +125,7 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     [LLRedEnvelopesMgr shared].isOpenRedEnvelopesAlert = _settingParam.isOpenRedEnvelopesAlert;
     [LLRedEnvelopesMgr shared].openRedEnvelopesDelaySecond = _settingParam.openRedEnvelopesDelaySecond;
     [LLRedEnvelopesMgr shared].wantSportStepCount = _settingParam.wantSportStepCount;
+    [LLRedEnvelopesMgr shared].filterRoomDic = _settingParam.filterRoomDic;
     [self.navigationController popViewControllerAnimated:YES];
 }
 
@@ -148,6 +160,7 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     LLFilterChatRoomController *chatRoomVC = [[NSClassFromString(@"LLFilterChatRoomController") alloc] init];
     MemberDataLogic *dataLogic = [[NSClassFromString(@"MemberDataLogic") alloc] initWithMemberList:[_contactsDataLogic getChatRoomContacts] admin:0x0];
     [chatRoomVC setMemberLogic:dataLogic];
+    chatRoomVC.filterRoomDic = _settingParam.filterRoomDic;
     [self.navigationController PushViewController:chatRoomVC animated:YES];
 }
 
@@ -161,9 +174,24 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     [self.view endEditing:YES];
 }
 
+- (void)onConfirmFilterChatRoom:(NSNotification *)notify{
+    _settingParam.filterRoomDic = notify.object;
+    [self reloadTableData]; //刷新页面
+}
+
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    [self exchangeMethod];
+}
+
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
     [self exchangeMethod]; //reset
+}
+
+- (void)dealloc{
+    [super dealloc];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 @end
