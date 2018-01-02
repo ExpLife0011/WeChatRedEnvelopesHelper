@@ -30,7 +30,7 @@ iOS版微信抢红包插件 tweak源文件
 
 - 非越狱手机
     1. 下载已打包好的[ipa](https://github.com/kevll/WeChatRedEnvelopesHelper/blob/master/ipa/WeChat-kevll.ipa)，使用[impactor](http://www.cydiaimpactor.com/)工具自行安装 （推荐）</br>
-        ipa百度网盘[下载链接](https://pan.baidu.com/s/1o8mmMG6)  密码: vh18 </br>
+        ipa百度网盘[下载链接](https://pan.baidu.com/s/1bKlctg)  密码: grdx </br>
       ![image](https://github.com/kevll/WeChatRedEnvelopesHelper/blob/master/screenshots/stepone.gif)</br>
       ![image](https://github.com/kevll/WeChatRedEnvelopesHelper/blob/master/screenshots/steptwo.gif)</br>
     2. 从XX助手上面下载越狱版ipa --> 解压缩 --> 拷贝WeChatRedEnvelopesHelper.dylib和libsubstate.dylib到Frameworks目录 --> 向WeChat二进制文件注入dylib -> 更改 WeChatRedEnvelopesHelper.dylib 依赖 --> 打包重签名安装
