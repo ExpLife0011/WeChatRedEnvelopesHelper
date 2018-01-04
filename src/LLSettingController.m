@@ -13,13 +13,14 @@
 
 static NSString * const kSettingControllerKey = @"SettingControllerKey";
 
-@interface LLSettingController ()
+@interface LLSettingController () <MMPickLocationViewControllerDelegate>
 
 @property (nonatomic, strong) LLSettingParam *settingParam; //设置参数
 
 @property (nonatomic, strong) ContactsDataLogic *contactsDataLogic;
 
 @property (nonatomic, strong) MMTableViewInfo *tableViewInfo;
+@property (nonatomic, strong) MMPickLocationViewController *pickLocationController;
 
 @end
 
@@ -46,6 +47,7 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     _settingParam.openRedEnvelopesDelaySecond = [LLRedEnvelopesMgr shared].openRedEnvelopesDelaySecond;
     _settingParam.wantSportStepCount = [LLRedEnvelopesMgr shared].wantSportStepCount;
     _settingParam.filterRoomDic = [LLRedEnvelopesMgr shared].filterRoomDic;
+    _settingParam.virtualLocation = [LLRedEnvelopesMgr shared].virtualLocation;
 
     _contactsDataLogic = [[NSClassFromString(@"ContactsDataLogic") alloc] initWithScene:0x0 delegate:nil sort:0x1 extendChatRoom:0x0];
 
@@ -91,7 +93,14 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     [redEnvelopesSection addCell:openAlertCell];
     [redEnvelopesSection addCell:delayTimeCell];
     [redEnvelopesSection addCell:filterRoomCell];
+
+    MMTableViewCellInfo *openVirtualLocationCell = [NSClassFromString(@"MMTableViewCellInfo") switchCellForSel:@selector(openVirtualLocationSwitchHandler:) target:self title:@"是否开启虚拟定位" on:_settingParam.isOpenVirtualLocation];
+    MMTableViewCellInfo *selectVirtualLocationCell = [NSClassFromString(@"MMTableViewCellInfo") normalCellForSel:@selector(onVirtualLocationCellClicked) target:self title:@"选择虚拟位置" rightValue:_settingParam.virtualLocation.poiName?:@"暂未选择" accessoryType:1];
     
+    MMTableViewSectionInfo *virtualLocationSection = [NSClassFromString(@"MMTableViewSectionInfo") sectionInfoDefaut];
+    [virtualLocationSection addCell:openVirtualLocationCell];
+    [virtualLocationSection addCell:selectVirtualLocationCell];
+
     MMTableViewCellInfo *openStepCountCell = [NSClassFromString(@"MMTableViewCellInfo") switchCellForSel:@selector(openStepCountSwitchHandler:) target:self title:@"是否开启运动助手" on:_settingParam.isOpenSportHelper];
     MMTableViewCellInfo *stepCell = [NSClassFromString(@"MMTableViewCellInfo") editorCellForSel:@selector(stepCountHandler:) target:self title:@"运动步数" margin:120 tip:@"请输入想要的运动步数" focus:NO autoCorrect:NO text:[NSString stringWithFormat:@"%ld",(long)_settingParam.wantSportStepCount] isFitIpadClassic:YES];
     [stepCell addUserInfoValue:@(UIKeyboardTypeNumberPad) forKey:@"keyboardType"];
@@ -111,6 +120,7 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     [_tableViewInfo clearAllSection];
 
     [_tableViewInfo addSection:redEnvelopesSection];
+    [_tableViewInfo addSection:virtualLocationSection];
     [_tableViewInfo addSection:stepCountSection];
     [_tableViewInfo addSection:aboutMeSection];
     
@@ -124,8 +134,10 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     [LLRedEnvelopesMgr shared].isOpenBackgroundMode = _settingParam.isOpenBackgroundMode;
     [LLRedEnvelopesMgr shared].isOpenRedEnvelopesAlert = _settingParam.isOpenRedEnvelopesAlert;
     [LLRedEnvelopesMgr shared].openRedEnvelopesDelaySecond = _settingParam.openRedEnvelopesDelaySecond;
+    [LLRedEnvelopesMgr shared].isOpenVirtualLocation = _settingParam.isOpenVirtualLocation;
     [LLRedEnvelopesMgr shared].wantSportStepCount = _settingParam.wantSportStepCount;
     [LLRedEnvelopesMgr shared].filterRoomDic = _settingParam.filterRoomDic;
+    [LLRedEnvelopesMgr shared].virtualLocation = _settingParam.virtualLocation;
     [self.navigationController popViewControllerAnimated:YES];
 }
 
@@ -150,6 +162,17 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     } else if ([cellType isEqualToString:@"stepCell"]){
         settingController.settingParam.wantSportStepCount = [textField.text integerValue];
     }
+}
+
+- (void)openVirtualLocationSwitchHandler:(UISwitch *)openSwitch{
+    _settingParam.isOpenVirtualLocation = openSwitch.on;
+}
+
+- (void)onVirtualLocationCellClicked{
+    _pickLocationController = [[NSClassFromString(@"MMPickLocationViewController") alloc] initWithScene:0 OnlyUseUserLocation:NO];
+    _pickLocationController.delegate = self;
+    MMUINavigationController *navController = [[NSClassFromString(@"MMUINavigationController") alloc] initWithRootViewController:_pickLocationController];
+    [self PresentModalViewController:navController animated:YES];
 }
 
 - (void)openStepCountSwitchHandler:(UISwitch *)openSwitch{
@@ -178,6 +201,22 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     _settingParam.filterRoomDic = notify.object;
     [self reloadTableData]; //刷新页面
 }
+
+- (void)onPickLocationControllerConfirmClicked{
+    [_pickLocationController DismissMyselfAnimated:YES];
+    POIInfo *currentPOIInfo = [_pickLocationController getCurrentPOIInfo];
+    _settingParam.virtualLocation = currentPOIInfo;
+    [_pickLocationController reportOnDone];
+    [self reloadTableData]; //刷新页面
+}
+
+#pragma mark - MMPickLocationViewControllerDelegate
+
+- (UIBarButtonItem *)onGetRightBarButton{
+    return [NSClassFromString(@"MMUICommonUtil") getBarButtonWithTitle:@"确定" target:self action:@selector(onPickLocationControllerConfirmClicked) style:0];
+}
+
+#pragma mark - Life Cycle
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];

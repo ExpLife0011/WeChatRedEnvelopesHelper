@@ -8,10 +8,13 @@
 
 #import "LLRedEnvelopesMgr.h"
 
+#define kArchiverLocationFilePath [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0] stringByAppendingPathComponent:@"LLVirutalLocationPOI"]
+
 static NSString * const isOpenRedEnvelopesHelperKey = @"isOpenRedEnvelopesHelperKey";
 static NSString * const isOpenSportHelperKey = @"isOpenSportHelperKey";
 static NSString * const isOpenBackgroundModeKey = @"isOpenBackgroundModeKey";
 static NSString * const isOpenRedEnvelopesAlertKey = @"isOpenRedEnvelopesAlertKey";
+static NSString * const isOpenVirtualLocationKey = @"isOpenVirtualLocationKey";
 static NSString * const openRedEnvelopesDelaySecondKey = @"openRedEnvelopesDelaySecondKey";
 static NSString * const wantSportStepCountKey = @"wantSportStepCountKey"; 
 static NSString * const filterRoomDicKey = @"filterRoomDicKey";
@@ -33,9 +36,19 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
         _isOpenSportHelper = [[NSUserDefaults standardUserDefaults] boolForKey:isOpenSportHelperKey];
         _isOpenBackgroundMode = [[NSUserDefaults standardUserDefaults] boolForKey:isOpenBackgroundModeKey];
         _isOpenRedEnvelopesAlert = [[NSUserDefaults standardUserDefaults] boolForKey:isOpenRedEnvelopesAlertKey];
+        _isOpenVirtualLocation = [[NSUserDefaults standardUserDefaults] boolForKey:isOpenVirtualLocationKey];
         _openRedEnvelopesDelaySecond = [[NSUserDefaults standardUserDefaults] floatForKey:openRedEnvelopesDelaySecondKey];
         _wantSportStepCount = [[NSUserDefaults standardUserDefaults] integerForKey:wantSportStepCountKey];
         _filterRoomDic = [[NSUserDefaults standardUserDefaults] objectForKey:filterRoomDicKey];
+
+        NSData *data = [NSData dataWithContentsOfFile:kArchiverLocationFilePath];
+        if(data){
+            @try{
+                self.virtualLocation = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+            }  @catch (NSException *exception) {
+                return self;
+            }
+        }
     }
     return self;
 }
@@ -96,6 +109,12 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
+- (void)setIsOpenVirtualLocation:(BOOL)isOpenVirtualLocation{
+    _isOpenVirtualLocation = isOpenVirtualLocation;
+    [[NSUserDefaults standardUserDefaults] setBool:isOpenVirtualLocation forKey:isOpenVirtualLocationKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 - (void)setOpenRedEnvelopesDelaySecond:(CGFloat)openRedEnvelopesDelaySecond{
     _openRedEnvelopesDelaySecond = openRedEnvelopesDelaySecond;
     [[NSUserDefaults standardUserDefaults] setFloat:openRedEnvelopesDelaySecond forKey:openRedEnvelopesDelaySecondKey];
@@ -112,6 +131,22 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
     _filterRoomDic = filterRoomDic;
     [[NSUserDefaults standardUserDefaults] setObject:filterRoomDic forKey:filterRoomDicKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (void)setVirtualLocation:(POIInfo *)virtualLocation{
+    _virtualLocation = virtualLocation;
+    if ([[NSFileManager defaultManager] fileExistsAtPath:kArchiverLocationFilePath]) {
+        NSError *error = nil;
+        [[NSFileManager defaultManager] removeItemAtPath:kArchiverLocationFilePath error:&error];
+        if (error) {
+            //[self showMessage:[NSString stringWithFormat:@"%@",error] completion:nil];
+            return;
+        }
+    }
+    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:virtualLocation];
+    if(data){
+        [data writeToFile:kArchiverLocationFilePath atomically:YES];
+    }
 }
 
 //判断是否抢红包

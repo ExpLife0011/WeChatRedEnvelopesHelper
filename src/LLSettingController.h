@@ -8,15 +8,19 @@
 
 #import <UIKit/UIKit.h>
 
+@class POIInfo;
+
 @interface LLSettingParam : NSObject
 
 @property (nonatomic, assign) BOOL isOpenRedEnvelopesHelper; //是否开启红包助手
 @property (nonatomic, assign) BOOL isOpenSportHelper; //是否开启步数助手
 @property (nonatomic, assign) BOOL isOpenBackgroundMode; //是否开启后台模式
 @property (nonatomic, assign) BOOL isOpenRedEnvelopesAlert; //是否打卡红包提醒
+@property (nonatomic, assign) BOOL isOpenVirtualLocation; //是否打开虚拟定位
 @property (nonatomic, assign) CGFloat openRedEnvelopesDelaySecond; //打开红包延迟时间
 @property (nonatomic, assign) NSInteger wantSportStepCount; //想要的运动步数
 @property (nonatomic, strong) NSMutableDictionary *filterRoomDic; //过滤群组字典
+@property (nonatomic, strong) POIInfo *virtualLocation; //虚拟位置
 
 @end
 

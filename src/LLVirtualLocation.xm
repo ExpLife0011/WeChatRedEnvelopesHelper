@@ -1,6 +1,17 @@
 #import <CoreLocation/CoreLocation.h>
 #import <MapKit/MapKit.h>
 
+/*
+%subclass LLPickLocationViewController : MMPickLocationViewController
+
+- (void)viewDidLoad{
+	%orig;
+	
+}
+
+%end
+*/
+
 %hook MMLocationMgr
 
 - (void)locationManager:(CLLocationManager *)manager

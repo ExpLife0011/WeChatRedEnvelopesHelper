@@ -44,6 +44,13 @@
 
 @end 
 
+@interface UIViewController (ModalView)
+
+- (void)PresentModalViewController:(id)arg1 animated:(_Bool)arg2;
+- (void)DismissMyselfAnimated:(_Bool)arg1;
+
+@end
+
 @interface BaseMsgContentViewController : UIViewController
 {
 	UITableView *m_tableView;
@@ -63,6 +70,12 @@
 
 - (void)tableView:(id)arg1 didSelectRowAtIndexPath:(id)arg2;
 - (void)openRedEnvelopes;
+
+@end
+
+@interface MMUINavigationController : UINavigationController
+
+- (id)initWithRootViewController:(id)arg1;
 
 @end
 
@@ -129,6 +142,7 @@
 
 @interface MMUICommonUtil : NSObject
 
++ (id)getBarButtonWithTitle:(id)arg1 target:(id)arg2 action:(SEL)arg3 style:(int)arg4;
 + (id)getBarButtonWithTitle:(id)arg1 target:(id)arg2 action:(SEL)arg3 style:(int)arg4 color:(id)arg6;
 + (id)getBarButtonWithImageName:(id)arg1 target:(id)arg2 action:(SEL)arg3 style:(int)arg4 accessibility:(id)arg5 useTemplateMode:(_Bool)arg6;
 
@@ -219,5 +233,33 @@
 @interface CAppViewControllerManager: NSObject
 
 + (UITabBarController *)getTabBarController;
+
+@end
+
+@interface POIInfo : NSObject <NSCoding>
+
+@property(retain, nonatomic) NSString *infoUrl; // @synthesize infoUrl=_infoUrl;
+@property(retain, nonatomic) NSString *poiName; // @synthesize poiName=_poiName;
+@property(retain, nonatomic) NSString *address; // @synthesize address=_address;
+@property(retain, nonatomic) NSString *bid; // @synthesize bid=_bid;
+@property(nonatomic) double scale; // @synthesize scale=_scale;
+@property(nonatomic) struct CLLocationCoordinate2D coordinate; // @synthesize coordinate=_coordinate;
+
+@end
+
+@protocol MMPickLocationViewControllerDelegate
+
+@optional
+- (UIBarButtonItem *)onGetRightBarButton;
+- (void)onCancelSeletctedLocation;
+@end
+
+@interface MMPickLocationViewController : UIViewController
+
+@property (nonatomic, weak) id <MMPickLocationViewControllerDelegate> delegate; // @synthesize delegate=_delegate;
+
+- (id)initWithScene:(unsigned int)arg1 OnlyUseUserLocation:(_Bool)arg2;
+- (id)getCurrentPOIInfo;
+- (void)reportOnDone;
 
 @end
