@@ -45,6 +45,7 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     _settingParam.isOpenBackgroundMode = [LLRedEnvelopesMgr shared].isOpenBackgroundMode;
     _settingParam.isOpenRedEnvelopesAlert = [LLRedEnvelopesMgr shared].isOpenRedEnvelopesAlert;
     _settingParam.openRedEnvelopesDelaySecond = [LLRedEnvelopesMgr shared].openRedEnvelopesDelaySecond;
+    _settingParam.isOpenVirtualLocation = [LLRedEnvelopesMgr shared].isOpenVirtualLocation;
     _settingParam.wantSportStepCount = [LLRedEnvelopesMgr shared].wantSportStepCount;
     _settingParam.filterRoomDic = [LLRedEnvelopesMgr shared].filterRoomDic;
     _settingParam.virtualLocation = [LLRedEnvelopesMgr shared].virtualLocation;
@@ -98,6 +99,7 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     MMTableViewCellInfo *selectVirtualLocationCell = [NSClassFromString(@"MMTableViewCellInfo") normalCellForSel:@selector(onVirtualLocationCellClicked) target:self title:@"选择虚拟位置" rightValue:_settingParam.virtualLocation.poiName?:@"暂未选择" accessoryType:1];
     
     MMTableViewSectionInfo *virtualLocationSection = [NSClassFromString(@"MMTableViewSectionInfo") sectionInfoDefaut];
+    [virtualLocationSection setHeaderView:[[UIView alloc] initWithFrame:CGRectMake(0,0,0,20)]];
     [virtualLocationSection addCell:openVirtualLocationCell];
     [virtualLocationSection addCell:selectVirtualLocationCell];
 
@@ -115,6 +117,7 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     MMTableViewCellInfo *githubCell = [NSClassFromString(@"MMTableViewCellInfo") normalCellForSel:@selector(onGithubCellClicked) target:self title:@"我的Github" rightValue:@"欢迎Star" accessoryType:1];
 
     MMTableViewSectionInfo *aboutMeSection = [NSClassFromString(@"MMTableViewSectionInfo") sectionInfoDefaut];
+    [aboutMeSection setHeaderView:[[UIView alloc] initWithFrame:CGRectMake(0,0,0,20)]];
     [aboutMeSection addCell:githubCell];
     
     [_tableViewInfo clearAllSection];
@@ -137,7 +140,7 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     [LLRedEnvelopesMgr shared].isOpenVirtualLocation = _settingParam.isOpenVirtualLocation;
     [LLRedEnvelopesMgr shared].wantSportStepCount = _settingParam.wantSportStepCount;
     [LLRedEnvelopesMgr shared].filterRoomDic = _settingParam.filterRoomDic;
-    [LLRedEnvelopesMgr shared].virtualLocation = _settingParam.virtualLocation;
+    [[LLRedEnvelopesMgr shared] saveVirtualLocation:_settingParam.virtualLocation];
     [self.navigationController popViewControllerAnimated:YES];
 }
 
@@ -214,6 +217,11 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
 
 - (UIBarButtonItem *)onGetRightBarButton{
     return [NSClassFromString(@"MMUICommonUtil") getBarButtonWithTitle:@"确定" target:self action:@selector(onPickLocationControllerConfirmClicked) style:0];
+}
+
+- (void)onCancelSeletctedLocation{
+    [_pickLocationController DismissMyselfAnimated:YES];
+    [_pickLocationController reportOnDone];
 }
 
 #pragma mark - Life Cycle

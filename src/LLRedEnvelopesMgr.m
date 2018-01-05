@@ -8,7 +8,7 @@
 
 #import "LLRedEnvelopesMgr.h"
 
-#define kArchiverLocationFilePath [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0] stringByAppendingPathComponent:@"LLVirutalLocationPOI"]
+#define kArchiverLocationFilePath [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0] stringByAppendingPathComponent:@"LLVirutalLocationPOIInfomation"]
 
 static NSString * const isOpenRedEnvelopesHelperKey = @"isOpenRedEnvelopesHelperKey";
 static NSString * const isOpenSportHelperKey = @"isOpenSportHelperKey";
@@ -134,19 +134,7 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
 }
 
 - (void)setVirtualLocation:(POIInfo *)virtualLocation{
-    _virtualLocation = virtualLocation;
-    if ([[NSFileManager defaultManager] fileExistsAtPath:kArchiverLocationFilePath]) {
-        NSError *error = nil;
-        [[NSFileManager defaultManager] removeItemAtPath:kArchiverLocationFilePath error:&error];
-        if (error) {
-            //[self showMessage:[NSString stringWithFormat:@"%@",error] completion:nil];
-            return;
-        }
-    }
-    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:virtualLocation];
-    if(data){
-        [data writeToFile:kArchiverLocationFilePath atomically:YES];
-    }
+    _virtualLocation = [virtualLocation retain];
 }
 
 //判断是否抢红包
@@ -261,6 +249,28 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
         self.blankPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:blankSoundURL error:nil];
         [self.blankPlayer play];
     }
+}
+
+//保存虚拟位置POIInfo
+- (void)saveVirtualLocation:(POIInfo *)virtualLocation{
+    self.virtualLocation = virtualLocation;
+    if ([[NSFileManager defaultManager] fileExistsAtPath:kArchiverLocationFilePath]) {
+        NSError *error = nil;
+        [[NSFileManager defaultManager] removeItemAtPath:kArchiverLocationFilePath error:&error];
+        if (error) {
+            //[self showMessage:[NSString stringWithFormat:@"%@",error] completion:nil];
+            return;
+        }
+    }
+    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:virtualLocation];
+    if(data){
+        [data writeToFile:kArchiverLocationFilePath atomically:YES];
+    }
+}
+
+//获取虚拟位置
+- (CLLocation *)getVirutalLocationWithRealLocation:(CLLocation *)realLocation{
+    return [[CLLocation alloc] initWithCoordinate:_virtualLocation.coordinate altitude:realLocation.altitude horizontalAccuracy: realLocation.horizontalAccuracy verticalAccuracy:realLocation.verticalAccuracy timestamp:realLocation.timestamp];
 }
 
 @end

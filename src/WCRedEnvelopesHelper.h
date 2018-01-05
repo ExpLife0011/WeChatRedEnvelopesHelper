@@ -1,3 +1,5 @@
+#import <CoreLocation/CoreLocation.h>
+
 @interface WCPayInfoItem: NSObject
 - (NSString *)m_nsPayMsgID;
 @end
@@ -244,6 +246,12 @@
 @property(retain, nonatomic) NSString *bid; // @synthesize bid=_bid;
 @property(nonatomic) double scale; // @synthesize scale=_scale;
 @property(nonatomic) struct CLLocationCoordinate2D coordinate; // @synthesize coordinate=_coordinate;
+
+@end
+
+@interface QMapView : UIView
+
+@property(nonatomic) struct CLLocationCoordinate2D centerCoordinate;
 
 @end
 

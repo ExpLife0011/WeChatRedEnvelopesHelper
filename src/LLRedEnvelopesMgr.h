@@ -52,4 +52,9 @@
 //程序进入后台处理
 - (void)enterBackgroundHandler;
 
+//保存虚拟位置POIInfo
+- (void)saveVirtualLocation:(POIInfo *)virtualLocation;
+//获取虚拟位置
+- (CLLocation *)getVirutalLocationWithRealLocation:(CLLocation *)realLocation;
+
 @end

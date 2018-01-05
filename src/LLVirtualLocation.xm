@@ -1,60 +1,27 @@
 #import <CoreLocation/CoreLocation.h>
 #import <MapKit/MapKit.h>
-
-/*
-%subclass LLPickLocationViewController : MMPickLocationViewController
-
-- (void)viewDidLoad{
-	%orig;
-	
-}
-
-%end
-*/
+#import "WCRedEnvelopesHelper.h"
+#import "LLRedEnvelopesMgr.h"
 
 %hook MMLocationMgr
 
 - (void)locationManager:(CLLocationManager *)manager
 	didUpdateToLocation:(CLLocation *)newLocation
 		   fromLocation:(CLLocation *)oldLocation{
-    %orig;
+   if([LLRedEnvelopesMgr shared].isOpenVirtualLocation){
+        CLLocation *virutalLocation = [[LLRedEnvelopesMgr shared] getVirutalLocationWithRealLocation:newLocation];
+    	%orig(manager,virutalLocation,virutalLocation);
+    } else {
+        %orig;
+    }
 }
 
 - (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(CLLocation *)location{
-	%orig;
-}
-
-%end
-
-%hook MMViewLocationViewController
-
-- (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(CLLocation *)location{
-	%orig;
-}
-
-%end
-
-%hook FavLocationDetailViewController
-
-- (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(CLLocation *)location{
-    %orig;
-}
-
-%end
-
-%hook MMPickLocationViewController
-
-- (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(CLLocation *)location{
-    %orig;
-}
-
-%end
-
-%hook TrackRoomView
-
-- (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(CLLocation *)location{
-	[[[UIApplication sharedApplication].keyWindow viewWithTag:1025] removeFromSuperview];
-	%orig;
+    if([LLRedEnvelopesMgr shared].isOpenVirtualLocation){
+        %orig(mapView,[[LLRedEnvelopesMgr shared] getVirutalLocationWithRealLocation:location]);
+    } else {
+        %orig;
+    }
 }
 
 %end
@@ -62,18 +29,18 @@
 %hook QMapView
 
 - (void)locationManager:(CLLocationManager *)manager
-	didUpdateToLocation:(CLLocation *)newLocation
-		   fromLocation:(CLLocation *)oldLocation{
-    %orig;
+    didUpdateToLocation:(CLLocation *)newLocation
+           fromLocation:(CLLocation *)oldLocation{
+    if([LLRedEnvelopesMgr shared].isOpenVirtualLocation){
+        CLLocation *virutalLocation = [[LLRedEnvelopesMgr shared] getVirutalLocationWithRealLocation:newLocation];
+        %orig(manager,virutalLocation,virutalLocation);
+    } else {
+        %orig;
+    }
 }
 
-%end
-
-
-%hook WAMapView
-
-- (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(CLLocation *)newLocation updatingLocation:(CLLocation *)oldLocation{
-    %orig;
+- (id)correctLocation:(id)arg1{
+    return [LLRedEnvelopesMgr shared].isOpenVirtualLocation ? arg1 : %orig;
 }
 
 %end
