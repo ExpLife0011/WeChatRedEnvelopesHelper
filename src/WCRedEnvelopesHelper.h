@@ -15,6 +15,9 @@
 
 - (WCPayInfoItem *)m_oWCPayInfoItem;
 - (id)nativeUrl;
+- (NSString *)wishingString;
+- (BOOL)IsSendBySendMsg;
++ (BOOL)isSenderFromMsgWrap:(CMessageWrap *)msgWrap;
 
 @end
 
@@ -36,6 +39,7 @@
 @interface CContactMgr: NSObject
 
 - (id)getContactByName:(id)arg1;
+- (id)getSelfContact;
 
 @end
 
@@ -62,6 +66,7 @@
 - (long long)numberOfSectionsInTableView:(id)arg1;
 - (void)tapAppNodeView:(id)arg1;
 - (CContact *)getChatContact;
+- (void)AsyncSendMessage:(NSString *)message;
 
 @end
 
@@ -87,9 +92,25 @@
 
 @end
 
+@interface WCRedEnvelopesReceiveControlLogic : NSObject
+
+- (void)OnCommitWCRedEnvelopes:(NSString *)arg1;
+
+@end
+
 @interface WCRedEnvelopesReceiveHomeView : UIView
 
 - (void)OnOpenRedEnvelopes;
+
+@end
+
+@protocol WCRedEnvelopesRedEnvelopesDetailViewControllerDelegate <NSObject>
+
+- (void)OnCommitWCRedEnvelopes:(NSString *)arg1;
+
+@end
+
+@interface WCRedEnvelopesRedEnvelopesDetailViewController : UIViewController
 
 @end
 
@@ -172,6 +193,8 @@
 @interface WCRedEnvelopesControlMgr: NSObject 
 
 - (void)startReceiveRedEnvelopesLogic:(UIViewController *)controller Data:(WCRedEnvelopesControlData *)data;
+- (unsigned int)startReceiveGreetingRedEnvelopesLogic:(id)arg1 Data:(id)arg2;
+- (unsigned int)startReceiveRedEnvelopesLogicByC2C:(id)arg1 Data:(id)arg2;
 
 @end
 

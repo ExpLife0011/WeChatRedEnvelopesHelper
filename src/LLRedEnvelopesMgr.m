@@ -15,6 +15,12 @@ static NSString * const isOpenSportHelperKey = @"isOpenSportHelperKey";
 static NSString * const isOpenBackgroundModeKey = @"isOpenBackgroundModeKey";
 static NSString * const isOpenRedEnvelopesAlertKey = @"isOpenRedEnvelopesAlertKey";
 static NSString * const isOpenVirtualLocationKey = @"isOpenVirtualLocationKey";
+static NSString * const isOpenAutoReplyKey = @"isOpenAutoReplyKey";
+static NSString * const isOpenAutoLeaveMessageKey = @"isOpenAutoLeaveMessageKey";
+static NSString * const isOpenKeywordFilterKey = @"isOpenKeywordFilterKey";
+static NSString * const keywordFilterTextKey = @"keywordFilterTextKey";
+static NSString * const autoReplyTextKey = @"autoReplyTextKey";
+static NSString * const autoLeaveMessageTextKey = @"autoLeaveMessageTextKey";
 static NSString * const openRedEnvelopesDelaySecondKey = @"openRedEnvelopesDelaySecondKey";
 static NSString * const wantSportStepCountKey = @"wantSportStepCountKey"; 
 static NSString * const filterRoomDicKey = @"filterRoomDicKey";
@@ -32,14 +38,21 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
 
 - (id)init{
     if(self = [super init]){
-        _isOpenRedEnvelopesHelper = [[NSUserDefaults standardUserDefaults] boolForKey:isOpenRedEnvelopesHelperKey];
-        _isOpenSportHelper = [[NSUserDefaults standardUserDefaults] boolForKey:isOpenSportHelperKey];
-        _isOpenBackgroundMode = [[NSUserDefaults standardUserDefaults] boolForKey:isOpenBackgroundModeKey];
-        _isOpenRedEnvelopesAlert = [[NSUserDefaults standardUserDefaults] boolForKey:isOpenRedEnvelopesAlertKey];
-        _isOpenVirtualLocation = [[NSUserDefaults standardUserDefaults] boolForKey:isOpenVirtualLocationKey];
-        _openRedEnvelopesDelaySecond = [[NSUserDefaults standardUserDefaults] floatForKey:openRedEnvelopesDelaySecondKey];
-        _wantSportStepCount = [[NSUserDefaults standardUserDefaults] integerForKey:wantSportStepCountKey];
-        _filterRoomDic = [[NSUserDefaults standardUserDefaults] objectForKey:filterRoomDicKey];
+        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+        _isOpenRedEnvelopesHelper = [userDefaults boolForKey:isOpenRedEnvelopesHelperKey];
+        _isOpenSportHelper = [userDefaults boolForKey:isOpenSportHelperKey];
+        _isOpenBackgroundMode = [userDefaults boolForKey:isOpenBackgroundModeKey];
+        _isOpenRedEnvelopesAlert = [userDefaults boolForKey:isOpenRedEnvelopesAlertKey];
+        _isOpenVirtualLocation = [userDefaults boolForKey:isOpenVirtualLocationKey];
+        _isOpenAutoReply = [userDefaults boolForKey:isOpenAutoReplyKey];
+        _isOpenAutoLeaveMessage = [userDefaults boolForKey:isOpenAutoLeaveMessageKey];
+        _isOpenKeywordFilter = [userDefaults boolForKey:isOpenKeywordFilterKey];
+        _keywordFilterText = [userDefaults objectForKey:keywordFilterTextKey];
+        _autoReplyText = [userDefaults objectForKey:autoReplyTextKey];
+        _autoLeaveMessageText = [userDefaults objectForKey:autoLeaveMessageTextKey];
+        _openRedEnvelopesDelaySecond = [userDefaults floatForKey:openRedEnvelopesDelaySecondKey];
+        _wantSportStepCount = [userDefaults integerForKey:wantSportStepCountKey];
+        _filterRoomDic = [userDefaults objectForKey:filterRoomDicKey];
 
         NSData *data = [NSData dataWithContentsOfFile:kArchiverLocationFilePath];
         if(data){
@@ -85,62 +98,113 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
     _openRedEnvelopesBlock = [openRedEnvelopesBlock copy];
 }
 
+//保存用户设置
+- (void)saveUserSetting{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setBool:_isOpenRedEnvelopesHelper forKey:isOpenRedEnvelopesHelperKey];
+    [userDefaults setBool:_isOpenSportHelper forKey:isOpenSportHelperKey];
+    [userDefaults setBool:_isOpenBackgroundMode forKey:isOpenBackgroundModeKey];
+    [userDefaults setBool:_isOpenRedEnvelopesAlert forKey:isOpenRedEnvelopesAlertKey];
+    [userDefaults setBool:_isOpenVirtualLocation forKey:isOpenVirtualLocationKey];
+    [userDefaults setBool:_isOpenAutoReply forKey:isOpenAutoReplyKey];
+    [userDefaults setBool:_isOpenAutoLeaveMessage forKey:isOpenAutoLeaveMessageKey];
+    [userDefaults setBool:_isOpenKeywordFilter forKey:isOpenKeywordFilterKey];
+    [userDefaults setObject:_keywordFilterText forKey:keywordFilterTextKey];
+    [userDefaults setObject:_autoReplyText forKey:autoReplyTextKey];
+    [userDefaults setObject:_autoLeaveMessageText forKey:autoLeaveMessageTextKey];
+    [userDefaults setFloat:_openRedEnvelopesDelaySecond forKey:openRedEnvelopesDelaySecondKey];
+    [userDefaults setInteger:_wantSportStepCount forKey:wantSportStepCountKey];
+    [userDefaults setObject:_filterRoomDic forKey:filterRoomDicKey];
+    [userDefaults synchronize];
+}
+/*
 - (void)setIsOpenRedEnvelopesHelper:(BOOL)isOpenRedEnvelopesHelper{
     _isOpenRedEnvelopesHelper = isOpenRedEnvelopesHelper;
-    [[NSUserDefaults standardUserDefaults] setBool:isOpenRedEnvelopesHelper forKey:isOpenRedEnvelopesHelperKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (void)setIsOpenSportHelper:(BOOL)isOpenSportHelper{
     _isOpenSportHelper = isOpenSportHelper;
-    [[NSUserDefaults standardUserDefaults] setBool:isOpenSportHelper forKey:isOpenSportHelperKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (void)setIsOpenBackgroundMode:(BOOL)isOpenBackgroundMode{
     _isOpenBackgroundMode = isOpenBackgroundMode;
-    [[NSUserDefaults standardUserDefaults] setBool:isOpenBackgroundMode forKey:isOpenBackgroundModeKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (void)setIsOpenRedEnvelopesAlert:(BOOL)isOpenRedEnvelopesAlert{
     _isOpenRedEnvelopesAlert = isOpenRedEnvelopesAlert;
-    [[NSUserDefaults standardUserDefaults] setBool:isOpenRedEnvelopesAlert forKey:isOpenRedEnvelopesAlertKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (void)setIsOpenVirtualLocation:(BOOL)isOpenVirtualLocation{
     _isOpenVirtualLocation = isOpenVirtualLocation;
-    [[NSUserDefaults standardUserDefaults] setBool:isOpenVirtualLocation forKey:isOpenVirtualLocationKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (void)setIsOpenAutoReply:(BOOL)isOpenAutoReply{
+    _isOpenAutoReply = isOpenAutoReply;
+}
+
+- (void)setIsOpenAutoLeaveMessage:(BOOL)isOpenAutoLeaveMessage{
+    _isOpenAutoLeaveMessage = isOpenAutoLeaveMessage;
+}
+
+- (void)setAutoReplyText:(NSString *)autoReplyText{
+    _autoReplyText = [autoReplyText copy];
+}
+
+- (void)setAutoLeaveMessageText:(NSString *)autoLeaveMessageText{
+    _autoLeaveMessageText = [autoLeaveMessageText copy];
 }
 
 - (void)setOpenRedEnvelopesDelaySecond:(CGFloat)openRedEnvelopesDelaySecond{
     _openRedEnvelopesDelaySecond = openRedEnvelopesDelaySecond;
-    [[NSUserDefaults standardUserDefaults] setFloat:openRedEnvelopesDelaySecond forKey:openRedEnvelopesDelaySecondKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (void)setWantSportStepCount:(NSInteger)wantSportStepCount{
     _wantSportStepCount = wantSportStepCount;
-    [[NSUserDefaults standardUserDefaults] setInteger:wantSportStepCount forKey:wantSportStepCountKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (void)setFilterRoomDic:(NSMutableDictionary *)filterRoomDic{
     _filterRoomDic = filterRoomDic;
-    [[NSUserDefaults standardUserDefaults] setObject:filterRoomDic forKey:filterRoomDicKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (void)setVirtualLocation:(POIInfo *)virtualLocation{
     _virtualLocation = [virtualLocation retain];
+}
+*/
+
+//处理微信消息,过滤红包消息
+- (void)handleMessageWithMessageWrap:(CMessageWrap *)msgWrap isBackground:(BOOL)isBackground{
+    if (msgWrap && msgWrap.m_uiMessageType == 49 && (msgWrap.m_n64MesSvrID == 0 || msgWrap.m_n64MesSvrID != self.lastMsgWrap.m_n64MesSvrID) && [self isSnatchRedEnvelopes:msgWrap]){
+        //红包消息
+        self.lastMsgWrap = self.msgWrap;
+        self.msgWrap = msgWrap;
+        self.haveNewRedEnvelopes = YES;
+        if(isBackground && self.openRedEnvelopesBlock){
+            self.openRedEnvelopesBlock();
+        }
+    }
+}
+
+//判断是否是我发送的消息
+- (BOOL)isMySendMsgWithMsgWrap:(CMessageWrap *)msgWrap{
+    CContactMgr *contactMgr = [[NSClassFromString(@"MMServiceCenter") defaultCenter] getService:NSClassFromString(@"CContactMgr")];
+    CContact *selfContact = [contactMgr getSelfContact];
+    CContact *senderContact = [contactMgr getContactByName:msgWrap.m_nsFromUsr];
+    return [selfContact isEqualToContact:senderContact];
 }
 
 //判断是否抢红包
 - (BOOL)isSnatchRedEnvelopes:(CMessageWrap *)msgWrap{
     if(_filterRoomDic && _filterRoomDic[msgWrap.m_nsFromUsr]){
         return NO; //过滤群组
+    }
+    if(_isOpenKeywordFilter){
+        NSString *wishing = [msgWrap wishingString];
+        NSArray *keywords = [_keywordFilterText componentsSeparatedByString:@","];
+        for (NSString *keyword in keywords) {
+            if ([wishing containsString:keyword]) {
+                return NO; //过滤关键字
+            }
+        }
     }
     return YES;
 }
@@ -165,10 +229,10 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
 
 - (void)handleRedEnvelopesPushVC:(BaseMsgContentViewController *)baseMsgVC{
     //红包push
-    if(![[self.msgWrap nativeUrl] containsString:@"weixin://openNativeUrl/weixinHB/startreceivebizhbrequest?"] && [[self.msgWrap m_oWCPayInfoItem] m_nsPayMsgID].length){
+    if(![[self.msgWrap nativeUrl] containsString:@"weixin://openNativeUrl/weixinHB/startreceivebizhbrequest?"]){
         CContactMgr *contactMgr = [[NSClassFromString(@"MMServiceCenter") defaultCenter] getService:NSClassFromString(@"CContactMgr")];
         CContact *fromContact = [contactMgr getContactByName:self.msgWrap.m_nsFromUsr];
-        if(![[baseMsgVC getChatContact] isEqualToContact:fromContact]){
+        if(![self isMySendMsgWithMsgWrap:self.msgWrap] && ![[baseMsgVC getChatContact] isEqualToContact:fromContact]){
             BaseMsgContentLogicController *logicController = [[NSClassFromString(@"BaseMsgContentLogicController") alloc] initWithLocalID:self.msgWrap.m_uiMesLocalID CreateTime:self.msgWrap.m_uiCreateTime ContentViewDisshowStatus:0x4];
             [logicController setM_contact:fromContact];
             [logicController setM_dicExtraInfo:nil];

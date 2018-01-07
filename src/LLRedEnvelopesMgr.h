@@ -23,6 +23,12 @@
 @property (nonatomic, assign) BOOL isOpenBackgroundMode; //是否开启后台模式
 @property (nonatomic, assign) BOOL isOpenRedEnvelopesAlert; //是否开启红包提醒
 @property (nonatomic, assign) BOOL isOpenVirtualLocation; //是否打开虚拟定位
+@property (nonatomic, assign) BOOL isOpenAutoReply; //是否打开自动回复
+@property (nonatomic, assign) BOOL isOpenAutoLeaveMessage; //是否打开自动留言
+@property (nonatomic, assign) BOOL isOpenKeywordFilter; //是否打开关键字过滤
+@property (nonatomic, copy)   NSString *keywordFilterText; //要过滤的关键字
+@property (nonatomic, copy)   NSString *autoReplyText; //自动回复内容
+@property (nonatomic, copy)   NSString *autoLeaveMessageText; //自动留言内容 
 @property (nonatomic, assign) CGFloat openRedEnvelopesDelaySecond; //打开红包延迟时间
 @property (nonatomic, assign) NSInteger wantSportStepCount; //想要的运动步数
 @property (nonatomic, assign) UIBackgroundTaskIdentifier bgTaskIdentifier; //后台任务标识符
@@ -39,6 +45,12 @@
 + (LLRedEnvelopesMgr *)shared;
 
 - (void)reset;
+
+//保存用户设置
+- (void)saveUserSetting;
+
+//处理微信消息,过滤红包消息
+- (void)handleMessageWithMessageWrap:(CMessageWrap *)msgWrap isBackground:(BOOL)isBackground;
 
 //判断是否抢红包
 - (BOOL)isSnatchRedEnvelopes:(CMessageWrap *)msgWrap;

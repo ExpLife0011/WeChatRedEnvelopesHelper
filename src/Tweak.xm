@@ -36,6 +36,14 @@
 		if (navController.viewControllers.count > 0){
 			if ([navController.viewControllers[0] isKindOfClass:NSClassFromString(@"WCRedEnvelopesRedEnvelopesDetailViewController")]){
 				//模态红包详情视图
+				if([LLRedEnvelopesMgr shared].isOpenAutoReply && [self isMemberOfClass:%c(BaseMsgContentViewController)]){
+					BaseMsgContentViewController *baseMsgVC = (BaseMsgContentViewController *)self;
+					[baseMsgVC AsyncSendMessage:[LLRedEnvelopesMgr shared].autoReplyText];
+				}
+				if([LLRedEnvelopesMgr shared].isOpenAutoLeaveMessage){
+					WCRedEnvelopesReceiveControlLogic *redEnvelopeLogic = MSHookIvar<WCRedEnvelopesReceiveControlLogic *>(navController.viewControllers[0],"m_delegate");
+					[redEnvelopeLogic OnCommitWCRedEnvelopes:[LLRedEnvelopesMgr shared].autoLeaveMessageText];
+				}
 				return;
 			}
 		}
@@ -51,12 +59,7 @@
 	%orig;
 	if([LLRedEnvelopesMgr shared].isOpenRedEnvelopesHelper){
 		CMessageWrap *msgWrap = ext[@"3"];
-	    if (msgWrap && msgWrap.m_uiMessageType == 49 && msgWrap.m_n64MesSvrID != [LLRedEnvelopesMgr shared].lastMsgWrap.m_n64MesSvrID && [[LLRedEnvelopesMgr shared] isSnatchRedEnvelopes:msgWrap]){
-	        //红包消息
-	        [LLRedEnvelopesMgr shared].lastMsgWrap = [LLRedEnvelopesMgr shared].msgWrap;
-	        [LLRedEnvelopesMgr shared].msgWrap = msgWrap;
-	        [LLRedEnvelopesMgr shared].haveNewRedEnvelopes = YES;
-	    }
+	    [[LLRedEnvelopesMgr shared] handleMessageWithMessageWrap:msgWrap isBackground:NO];
 	}
 }
 
@@ -65,15 +68,7 @@
 	if ([LLRedEnvelopesMgr shared].isOpenRedEnvelopesHelper && [LLRedEnvelopesMgr shared].isOpenBackgroundMode && [UIApplication sharedApplication].applicationState == UIApplicationStateBackground){
 		//app在后台运行
 		CMessageWrap *msgWrap = (CMessageWrap *)message;
-	    if (msgWrap && msgWrap.m_uiMessageType == 49 && msgWrap.m_n64MesSvrID != [LLRedEnvelopesMgr shared].lastMsgWrap.m_n64MesSvrID && [[LLRedEnvelopesMgr shared] isSnatchRedEnvelopes:msgWrap]){
-	        //红包消息
-	        [LLRedEnvelopesMgr shared].lastMsgWrap = [LLRedEnvelopesMgr shared].msgWrap;
-	        [LLRedEnvelopesMgr shared].msgWrap = msgWrap;
-	        [LLRedEnvelopesMgr shared].haveNewRedEnvelopes = YES;
-	        if([LLRedEnvelopesMgr shared].openRedEnvelopesBlock){
-	        	[LLRedEnvelopesMgr shared].openRedEnvelopesBlock();
-			}
-	    }
+	    [[LLRedEnvelopesMgr shared] handleMessageWithMessageWrap:msgWrap isBackground:YES];
 	}
 }
 
