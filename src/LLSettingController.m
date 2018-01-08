@@ -54,6 +54,11 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     _settingParam.autoLeaveMessageText = manager.autoLeaveMessageText;
     _settingParam.isOpenKeywordFilter = manager.isOpenKeywordFilter;
     _settingParam.keywordFilterText = manager.keywordFilterText;
+    _settingParam.isSnatchSelfRedEnvelopes = manager.isSnatchSelfRedEnvelopes;
+    _settingParam.isOpenAvoidRevokeMessage = manager.isOpenAvoidRevokeMessage;
+    _settingParam.sportStepCountMode = manager.sportStepCountMode;
+    _settingParam.sportStepCountUpperLimit = manager.sportStepCountUpperLimit;
+    _settingParam.sportStepCountLowerLimit = manager.sportStepCountLowerLimit;
     _settingParam.wantSportStepCount = manager.wantSportStepCount;
     _settingParam.filterRoomDic = manager.filterRoomDic;
     _settingParam.virtualLocation = manager.virtualLocation;
@@ -106,6 +111,7 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     MMTableViewCellInfo *keywordFilterTextCell = [NSClassFromString(@"MMTableViewCellInfo") editorCellForSel:nil target:nil title:@"关键字过滤" margin:120 tip:@"多个关键字以英文逗号分隔" focus:NO autoCorrect:NO text:_settingParam.keywordFilterText isFitIpadClassic:YES];
     [keywordFilterTextCell addUserInfoValue:@"keywordFilterTextCell" forKey:@"cellType"];
     objc_setAssociatedObject(keywordFilterTextCell, &kSettingControllerKey, self, OBJC_ASSOCIATION_ASSIGN);
+    MMTableViewCellInfo *isSnatchSelfCell = [NSClassFromString(@"MMTableViewCellInfo") switchCellForSel:@selector(isSnatchSelfRedEnvelopesSwitchHandler:) target:self title:@"是否抢自己发的红包" on:_settingParam.isSnatchSelfRedEnvelopes];
 
     MMTableViewSectionInfo *redEnvelopesSection = [NSClassFromString(@"MMTableViewSectionInfo") sectionInfoDefaut];
     [redEnvelopesSection setHeaderView:[[UIView alloc] initWithFrame:CGRectMake(0,0,0,20)]];
@@ -120,6 +126,7 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     [redEnvelopesSection addCell:autoLeaveMessageTextCell];
     [redEnvelopesSection addCell:openKeywordFilterCell];
     [redEnvelopesSection addCell:keywordFilterTextCell];
+    [redEnvelopesSection addCell:isSnatchSelfCell];
 
     MMTableViewCellInfo *openVirtualLocationCell = [NSClassFromString(@"MMTableViewCellInfo") switchCellForSel:@selector(openVirtualLocationSwitchHandler:) target:self title:@"是否开启虚拟定位" on:_settingParam.isOpenVirtualLocation];
     MMTableViewCellInfo *selectVirtualLocationCell = [NSClassFromString(@"MMTableViewCellInfo") normalCellForSel:@selector(onVirtualLocationCellClicked) target:self title:@"选择虚拟位置" rightValue:_settingParam.virtualLocation.poiName?:@"暂未选择" accessoryType:1];
@@ -130,15 +137,36 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     [virtualLocationSection addCell:selectVirtualLocationCell];
 
     MMTableViewCellInfo *openStepCountCell = [NSClassFromString(@"MMTableViewCellInfo") switchCellForSel:@selector(openStepCountSwitchHandler:) target:self title:@"是否开启运动助手" on:_settingParam.isOpenSportHelper];
-    MMTableViewCellInfo *stepCell = [NSClassFromString(@"MMTableViewCellInfo") editorCellForSel:@selector(stepCountHandler:) target:self title:@"运动步数" margin:120 tip:@"请输入想要的运动步数" focus:NO autoCorrect:NO text:[NSString stringWithFormat:@"%ld",(long)_settingParam.wantSportStepCount] isFitIpadClassic:YES];
+    MMTableViewCellInfo *stepCountModeCell = [NSClassFromString(@"MMTableViewCellInfo") switchCellForSel:@selector(stepCountModeSwitchHandler:) target:self title:@"范围随机/固定步数" on:_settingParam.sportStepCountMode];
+    MMTableViewCellInfo *stepCell = [NSClassFromString(@"MMTableViewCellInfo") editorCellForSel:nil target:nil title:@"固定运动步数" margin:120 tip:@"请输入想要的运动步数" focus:NO autoCorrect:NO text:[NSString stringWithFormat:@"%ld",(long)_settingParam.wantSportStepCount] isFitIpadClassic:YES];
     [stepCell addUserInfoValue:@(UIKeyboardTypeNumberPad) forKey:@"keyboardType"];
     [stepCell addUserInfoValue:@"stepCell" forKey:@"cellType"];
     objc_setAssociatedObject(stepCell, &kSettingControllerKey, self, OBJC_ASSOCIATION_ASSIGN);
+    MMTableViewCellInfo *stepUpperLimitCell = [NSClassFromString(@"MMTableViewCellInfo") editorCellForSel:nil target:nil title:@"运动步数上限" margin:120 tip:@"请输入运动步数上限" focus:NO autoCorrect:NO text:[NSString stringWithFormat:@"%ld",(long)_settingParam.sportStepCountUpperLimit] isFitIpadClassic:YES];
+    [stepUpperLimitCell addUserInfoValue:@(UIKeyboardTypeNumberPad) forKey:@"keyboardType"];
+    [stepUpperLimitCell addUserInfoValue:@"stepUpperLimitCell" forKey:@"cellType"];
+    objc_setAssociatedObject(stepUpperLimitCell, &kSettingControllerKey, self, OBJC_ASSOCIATION_ASSIGN);
+    MMTableViewCellInfo *stepLowerLimitCell = [NSClassFromString(@"MMTableViewCellInfo") editorCellForSel:nil target:nil title:@"运动步数下限" margin:120 tip:@"请输入运动步数下限" focus:NO autoCorrect:NO text:[NSString stringWithFormat:@"%ld",(long)_settingParam.sportStepCountLowerLimit] isFitIpadClassic:YES];
+    [stepLowerLimitCell addUserInfoValue:@(UIKeyboardTypeNumberPad) forKey:@"keyboardType"];
+    [stepLowerLimitCell addUserInfoValue:@"stepLowerLimitCell" forKey:@"cellType"];
+    objc_setAssociatedObject(stepLowerLimitCell, &kSettingControllerKey, self, OBJC_ASSOCIATION_ASSIGN);
 
     MMTableViewSectionInfo *stepCountSection = [NSClassFromString(@"MMTableViewSectionInfo") sectionInfoDefaut];
     [stepCountSection setHeaderView:[[UIView alloc] initWithFrame:CGRectMake(0,0,0,20)]];
     [stepCountSection addCell:openStepCountCell];
-    [stepCountSection addCell:stepCell];
+    [stepCountSection addCell:stepCountModeCell];
+    if(_settingParam.sportStepCountMode){
+        [stepCountSection addCell:stepUpperLimitCell];
+        [stepCountSection addCell:stepLowerLimitCell];
+    } else {
+        [stepCountSection addCell:stepCell];
+    }
+
+    MMTableViewCellInfo *openAvoidRevokeMessageCell = [NSClassFromString(@"MMTableViewCellInfo") switchCellForSel:@selector(openAvoidRevokeMessageSwitchHandler:) target:self title:@"是否防好友撤回消息" on:_settingParam.isOpenAvoidRevokeMessage];
+
+    MMTableViewSectionInfo *revokeMessageSection = [NSClassFromString(@"MMTableViewSectionInfo") sectionInfoDefaut];
+    [revokeMessageSection setHeaderView:[[UIView alloc] initWithFrame:CGRectMake(0,0,0,20)]];
+    [revokeMessageSection addCell:openAvoidRevokeMessageCell];
 
     MMTableViewCellInfo *githubCell = [NSClassFromString(@"MMTableViewCellInfo") normalCellForSel:@selector(onGithubCellClicked) target:self title:@"我的Github" rightValue:@"欢迎Star" accessoryType:1];
 
@@ -151,6 +179,7 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     [_tableViewInfo addSection:redEnvelopesSection];
     [_tableViewInfo addSection:virtualLocationSection];
     [_tableViewInfo addSection:stepCountSection];
+    [_tableViewInfo addSection:revokeMessageSection];
     [_tableViewInfo addSection:aboutMeSection];
     
     [[_tableViewInfo getTableView] reloadData];
@@ -171,6 +200,11 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     manager.autoLeaveMessageText = _settingParam.autoLeaveMessageText;
     manager.isOpenKeywordFilter = _settingParam.isOpenKeywordFilter;
     manager.keywordFilterText = _settingParam.keywordFilterText;
+    manager.isSnatchSelfRedEnvelopes = _settingParam.isSnatchSelfRedEnvelopes;
+    manager.isOpenAvoidRevokeMessage = _settingParam.isOpenAvoidRevokeMessage;
+    manager.sportStepCountMode = _settingParam.sportStepCountMode;
+    manager.sportStepCountUpperLimit = _settingParam.sportStepCountUpperLimit;
+    manager.sportStepCountLowerLimit = _settingParam.sportStepCountLowerLimit;
     manager.wantSportStepCount = _settingParam.wantSportStepCount;
     manager.filterRoomDic = _settingParam.filterRoomDic;
     [manager saveVirtualLocation:_settingParam.virtualLocation];
@@ -216,7 +250,11 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
         settingController.settingParam.autoLeaveMessageText = textField.text;
     } else if ([cellType isEqualToString:@"keywordFilterTextCell"]){
         settingController.settingParam.keywordFilterText = textField.text;
-    }
+    } else if ([cellType isEqualToString:@"stepUpperLimitCell"]){
+        settingController.settingParam.sportStepCountUpperLimit = [textField.text integerValue];
+    } else if ([cellType isEqualToString:@"stepLowerLimitCell"]){
+        settingController.settingParam.sportStepCountLowerLimit = [textField.text integerValue];
+    } 
 }
 
 - (void)openVirtualLocationSwitchHandler:(UISwitch *)openSwitch{
@@ -234,12 +272,25 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     _settingParam.isOpenSportHelper = openSwitch.on;
 }
 
+- (void)stepCountModeSwitchHandler:(UISwitch *)modeSwitch{
+    _settingParam.sportStepCountMode = modeSwitch.on;
+    [self reloadTableData]; //刷新页面
+}
+
+- (void)isSnatchSelfRedEnvelopesSwitchHandler:(UISwitch *)openSwitch{
+    _settingParam.isSnatchSelfRedEnvelopes = openSwitch.on;
+}
+
 - (void)onfilterRoomCellClicked{
     LLFilterChatRoomController *chatRoomVC = [[NSClassFromString(@"LLFilterChatRoomController") alloc] init];
     MemberDataLogic *dataLogic = [[NSClassFromString(@"MemberDataLogic") alloc] initWithMemberList:[_contactsDataLogic getChatRoomContacts] admin:0x0];
     [chatRoomVC setMemberLogic:dataLogic];
     chatRoomVC.filterRoomDic = _settingParam.filterRoomDic;
     [self.navigationController PushViewController:chatRoomVC animated:YES];
+}
+
+- (void)openAvoidRevokeMessageSwitchHandler:(UISwitch *)openSwitch{
+    _settingParam.isOpenAvoidRevokeMessage = openSwitch.on;
 }
 
 - (void)onGithubCellClicked{

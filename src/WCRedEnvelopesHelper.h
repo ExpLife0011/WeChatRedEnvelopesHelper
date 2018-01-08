@@ -1,6 +1,7 @@
 #import <CoreLocation/CoreLocation.h>
 
 @interface WCPayInfoItem: NSObject
+@property(retain, nonatomic) NSString *m_nsPayMsgID; // @synthesize m_nsPayMsgID;
 - (NSString *)m_nsPayMsgID;
 @end
 @interface CMessageWrap : NSObject
@@ -12,6 +13,7 @@
 @property(nonatomic) unsigned int m_uiCreateTime; // @synthesize m_uiCreateTime;
 @property(retain, nonatomic) NSString *m_nsFromUsr; // @synthesize m_nsFromUsr;
 @property(retain, nonatomic) NSString *m_nsToUsr; // @synthesize m_nsToUsr;
+@property(retain, nonatomic) WCPayInfoItem *m_oWCPayInfoItem; // @dynamic m_oWCPayInfoItem;
 
 - (WCPayInfoItem *)m_oWCPayInfoItem;
 - (id)nativeUrl;

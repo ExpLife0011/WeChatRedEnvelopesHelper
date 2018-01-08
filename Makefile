@@ -1,4 +1,4 @@
-THEOS_DEVICE_IP = 192.168.0.4
+THEOS_DEVICE_IP = 192.168.2.9
 
 include $(THEOS)/makefiles/common.mk
 

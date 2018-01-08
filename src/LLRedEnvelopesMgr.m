@@ -18,6 +18,11 @@ static NSString * const isOpenVirtualLocationKey = @"isOpenVirtualLocationKey";
 static NSString * const isOpenAutoReplyKey = @"isOpenAutoReplyKey";
 static NSString * const isOpenAutoLeaveMessageKey = @"isOpenAutoLeaveMessageKey";
 static NSString * const isOpenKeywordFilterKey = @"isOpenKeywordFilterKey";
+static NSString * const isSnatchSelfRedEnvelopesKey = @"isSnatchSelfRedEnvelopesKey";
+static NSString * const isOpenAvoidRevokeMessageKey = @"isOpenAvoidRevokeMessageKey";
+static NSString * const sportStepCountModeKey = @"sportStepCountModeKey";
+static NSString * const sportStepCountUpperLimitKey = @"sportStepCountUpperLimitKey";
+static NSString * const sportStepCountLowerLimitkey = @"sportStepCountLowerLimitkey";
 static NSString * const keywordFilterTextKey = @"keywordFilterTextKey";
 static NSString * const autoReplyTextKey = @"autoReplyTextKey";
 static NSString * const autoLeaveMessageTextKey = @"autoLeaveMessageTextKey";
@@ -47,6 +52,11 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
         _isOpenAutoReply = [userDefaults boolForKey:isOpenAutoReplyKey];
         _isOpenAutoLeaveMessage = [userDefaults boolForKey:isOpenAutoLeaveMessageKey];
         _isOpenKeywordFilter = [userDefaults boolForKey:isOpenKeywordFilterKey];
+        _isSnatchSelfRedEnvelopes = [userDefaults boolForKey:isSnatchSelfRedEnvelopesKey];
+        _isOpenAvoidRevokeMessage = [userDefaults boolForKey:isOpenAvoidRevokeMessageKey];
+        _sportStepCountMode = [userDefaults boolForKey:sportStepCountModeKey];
+        _sportStepCountUpperLimit = [userDefaults integerForKey:sportStepCountUpperLimitKey];
+        _sportStepCountLowerLimit = [userDefaults integerForKey:sportStepCountLowerLimitkey];
         _keywordFilterText = [userDefaults objectForKey:keywordFilterTextKey];
         _autoReplyText = [userDefaults objectForKey:autoReplyTextKey];
         _autoLeaveMessageText = [userDefaults objectForKey:autoLeaveMessageTextKey];
@@ -109,6 +119,11 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
     [userDefaults setBool:_isOpenAutoReply forKey:isOpenAutoReplyKey];
     [userDefaults setBool:_isOpenAutoLeaveMessage forKey:isOpenAutoLeaveMessageKey];
     [userDefaults setBool:_isOpenKeywordFilter forKey:isOpenKeywordFilterKey];
+    [userDefaults setBool:_isSnatchSelfRedEnvelopes forKey:isSnatchSelfRedEnvelopesKey];
+    [userDefaults setBool:_isOpenAvoidRevokeMessage forKey:isOpenAvoidRevokeMessageKey];
+    [userDefaults setBool:_sportStepCountMode forKey:sportStepCountModeKey];
+    [userDefaults setInteger:_sportStepCountUpperLimit forKey:sportStepCountUpperLimitKey];
+    [userDefaults setInteger:_sportStepCountLowerLimit forKey:sportStepCountLowerLimitkey];
     [userDefaults setObject:_keywordFilterText forKey:keywordFilterTextKey];
     [userDefaults setObject:_autoReplyText forKey:autoReplyTextKey];
     [userDefaults setObject:_autoLeaveMessageText forKey:autoLeaveMessageTextKey];
@@ -173,7 +188,7 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
 
 //处理微信消息,过滤红包消息
 - (void)handleMessageWithMessageWrap:(CMessageWrap *)msgWrap isBackground:(BOOL)isBackground{
-    if (msgWrap && msgWrap.m_uiMessageType == 49 && (msgWrap.m_n64MesSvrID == 0 || msgWrap.m_n64MesSvrID != self.lastMsgWrap.m_n64MesSvrID) && [self isSnatchRedEnvelopes:msgWrap]){
+    if (msgWrap && msgWrap.m_uiMessageType == 49 && [self isSnatchRedEnvelopes:msgWrap]){
         //红包消息
         self.lastMsgWrap = self.msgWrap;
         self.msgWrap = msgWrap;
@@ -194,6 +209,12 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
 
 //判断是否抢红包
 - (BOOL)isSnatchRedEnvelopes:(CMessageWrap *)msgWrap{
+    if(!((msgWrap.m_n64MesSvrID == 0 && msgWrap.m_oWCPayInfoItem.m_nsPayMsgID != self.lastMsgWrap.m_oWCPayInfoItem.m_nsPayMsgID) || msgWrap.m_n64MesSvrID != self.lastMsgWrap.m_n64MesSvrID)){
+        return NO; //过滤领取红包消息
+    }
+    if([self isMySendMsgWithMsgWrap:msgWrap]){
+        return _isSnatchSelfRedEnvelopes;
+    }
     if(_filterRoomDic && _filterRoomDic[msgWrap.m_nsFromUsr]){
         return NO; //过滤群组
     }
@@ -232,7 +253,8 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
     if(![[self.msgWrap nativeUrl] containsString:@"weixin://openNativeUrl/weixinHB/startreceivebizhbrequest?"]){
         CContactMgr *contactMgr = [[NSClassFromString(@"MMServiceCenter") defaultCenter] getService:NSClassFromString(@"CContactMgr")];
         CContact *fromContact = [contactMgr getContactByName:self.msgWrap.m_nsFromUsr];
-        if(![self isMySendMsgWithMsgWrap:self.msgWrap] && ![[baseMsgVC getChatContact] isEqualToContact:fromContact]){
+        BOOL isMySendMsg = [self isMySendMsgWithMsgWrap:self.msgWrap];
+        if(!isMySendMsg && ![[baseMsgVC getChatContact] isEqualToContact:fromContact]){
             BaseMsgContentLogicController *logicController = [[NSClassFromString(@"BaseMsgContentLogicController") alloc] initWithLocalID:self.msgWrap.m_uiMesLocalID CreateTime:self.msgWrap.m_uiCreateTime ContentViewDisshowStatus:0x4];
             [logicController setM_contact:fromContact];
             [logicController setM_dicExtraInfo:nil];
@@ -245,10 +267,15 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
         WCRedEnvelopesControlData *data = [[NSClassFromString(@"WCRedEnvelopesControlData") alloc] init];
         [data setM_oSelectedMessageWrap:self.msgWrap];
         WCRedEnvelopesControlMgr *controlMgr = [[NSClassFromString(@"MMServiceCenter") defaultCenter] getService:NSClassFromString(@"WCRedEnvelopesControlMgr")];
-        //if(baseMsgVC.view){
+        if(isMySendMsg){
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                self.isHiddenRedEnvelopesReceiveView = YES;
+                [controlMgr startReceiveRedEnvelopesLogic:baseMsgVC Data:data];
+            });
+        } else {
             self.isHiddenRedEnvelopesReceiveView = YES;
-            [controlMgr startReceiveRedEnvelopesLogic:baseMsgVC Data:data];                
-        //}
+            [controlMgr startReceiveRedEnvelopesLogic:baseMsgVC Data:data];
+        }
     }
 }
 
@@ -334,7 +361,21 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
 
 //获取虚拟位置
 - (CLLocation *)getVirutalLocationWithRealLocation:(CLLocation *)realLocation{
-    return [[CLLocation alloc] initWithCoordinate:_virtualLocation.coordinate altitude:realLocation.altitude horizontalAccuracy: realLocation.horizontalAccuracy verticalAccuracy:realLocation.verticalAccuracy timestamp:realLocation.timestamp];
+    return _virtualLocation ? [[CLLocation alloc] initWithCoordinate:_virtualLocation.coordinate altitude:realLocation.altitude horizontalAccuracy: realLocation.horizontalAccuracy verticalAccuracy:realLocation.verticalAccuracy timestamp:realLocation.timestamp] : realLocation;
 }
+
+//处理运动步数
+- (long)getSportStepCount{
+    if(_sportStepCountMode){
+        return [self genRandomNumberFrom:_sportStepCountUpperLimit to:_sportStepCountLowerLimit];
+    } else {
+        return _wantSportStepCount;
+    }
+}
+
+//在指定范围生成随机数
+- (long)genRandomNumberFrom:(long)from to:(long)to{  
+    return (long)(from + (arc4random() % (to - from + 1)));  
+}  
 
 @end
