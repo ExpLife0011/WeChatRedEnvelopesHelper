@@ -8,16 +8,16 @@
 - (void)locationManager:(CLLocationManager *)manager
 	didUpdateToLocation:(CLLocation *)newLocation
 		   fromLocation:(CLLocation *)oldLocation{
-   if([LLRedEnvelopesMgr shared].isOpenVirtualLocation){
+   if([LLRedEnvelopesMgr shared].isOpenVirtualLocation && newLocation && [newLocation isMemberOfClass:[CLLocation class]]){
         CLLocation *virutalLocation = [[LLRedEnvelopesMgr shared] getVirutalLocationWithRealLocation:newLocation];
-    	%orig(manager,virutalLocation,virutalLocation);
+    	%orig(manager,virutalLocation,oldLocation?virutalLocation:nil);
     } else {
         %orig;
     }
 }
 
 - (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(CLLocation *)location{
-    if([LLRedEnvelopesMgr shared].isOpenVirtualLocation){
+    if([LLRedEnvelopesMgr shared].isOpenVirtualLocation && location && [location isMemberOfClass:[CLLocation class]]){
         %orig(mapView,[[LLRedEnvelopesMgr shared] getVirutalLocationWithRealLocation:location]);
     } else {
         %orig;
@@ -31,9 +31,9 @@
 - (void)locationManager:(CLLocationManager *)manager
     didUpdateToLocation:(CLLocation *)newLocation
            fromLocation:(CLLocation *)oldLocation{
-    if([LLRedEnvelopesMgr shared].isOpenVirtualLocation){
+    if([LLRedEnvelopesMgr shared].isOpenVirtualLocation && newLocation && [newLocation isMemberOfClass:[CLLocation class]]){
         CLLocation *virutalLocation = [[LLRedEnvelopesMgr shared] getVirutalLocationWithRealLocation:newLocation];
-        %orig(manager,virutalLocation,virutalLocation);
+        %orig(manager,virutalLocation,oldLocation?virutalLocation:nil);
     } else {
         %orig;
     }

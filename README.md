@@ -1,7 +1,7 @@
 ## WeChatRedEnvelopesHelper
 iOS版微信抢红包插件 tweak源文件
 
-## V2.0.0版本更新内容
+## V2.0.1版本更新内容
 - 增加好友消息防撤回
 - 增加虚拟定位功能
 - 增加领取红包后自动回复
@@ -40,7 +40,7 @@ iOS版微信抢红包插件 tweak源文件
 
 - 非越狱手机
     1. 下载已打包好的ipa，使用[impactor](http://www.cydiaimpactor.com/)工具自行安装 （推荐）</br>
-        ipa百度网盘[下载链接](https://pan.baidu.com/s/1o83it30)  密码: s7mf </br>
+        ipa百度网盘[下载链接](https://pan.baidu.com/s/1mkd0ymc)  密码: sfjs </br>
       ![image](https://github.com/kevll/WeChatRedEnvelopesHelper/blob/master/screenshots/stepone.gif)</br>
       ![image](https://github.com/kevll/WeChatRedEnvelopesHelper/blob/master/screenshots/steptwo.gif)</br>
     2. 从XX助手上面下载越狱版ipa --> 解压缩 --> 拷贝WeChatRedEnvelopesHelper.dylib和libsubstate.dylib到Frameworks目录 --> 向WeChat二进制文件注入dylib -> 更改 WeChatRedEnvelopesHelper.dylib 依赖 --> 打包重签名安装

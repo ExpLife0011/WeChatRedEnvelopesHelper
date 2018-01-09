@@ -1,6 +1,8 @@
 #import <CoreLocation/CoreLocation.h>
 
 @interface WCPayInfoItem: NSObject
+@property(nonatomic) unsigned int m_sceneId; // @synthesize m_sceneId;
+@property(nonatomic) unsigned int m_uiPaySubType; // @synthesize m_uiPaySubType;
 @property(retain, nonatomic) NSString *m_nsPayMsgID; // @synthesize m_nsPayMsgID;
 - (NSString *)m_nsPayMsgID;
 @end
@@ -14,6 +16,7 @@
 @property(retain, nonatomic) NSString *m_nsFromUsr; // @synthesize m_nsFromUsr;
 @property(retain, nonatomic) NSString *m_nsToUsr; // @synthesize m_nsToUsr;
 @property(retain, nonatomic) WCPayInfoItem *m_oWCPayInfoItem; // @dynamic m_oWCPayInfoItem;
+@property(nonatomic) unsigned int m_uiAppMsgInnerType; // @dynamic m_uiAppMsgInnerType;
 
 - (WCPayInfoItem *)m_oWCPayInfoItem;
 - (id)nativeUrl;

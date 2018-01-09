@@ -209,6 +209,16 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
 
 //判断是否抢红包
 - (BOOL)isSnatchRedEnvelopes:(CMessageWrap *)msgWrap{
+    unsigned int appMsgInnerType = msgWrap.m_uiAppMsgInnerType;
+    if(appMsgInnerType == 0x1 || appMsgInnerType == 0xa){
+        return NO;
+    }
+    if(!(appMsgInnerType != 0x7d0 || msgWrap.m_oWCPayInfoItem.m_uiPaySubType >= 0xb)){
+        return NO;
+    }
+    if(appMsgInnerType != 0x7d1 || msgWrap.m_oWCPayInfoItem.m_sceneId != 0x3ea){
+        return NO;
+    }
     if(!((msgWrap.m_n64MesSvrID == 0 && msgWrap.m_oWCPayInfoItem.m_nsPayMsgID != self.lastMsgWrap.m_oWCPayInfoItem.m_nsPayMsgID) || msgWrap.m_n64MesSvrID != self.lastMsgWrap.m_n64MesSvrID)){
         return NO; //过滤领取红包消息
     }
@@ -267,15 +277,8 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
         WCRedEnvelopesControlData *data = [[NSClassFromString(@"WCRedEnvelopesControlData") alloc] init];
         [data setM_oSelectedMessageWrap:self.msgWrap];
         WCRedEnvelopesControlMgr *controlMgr = [[NSClassFromString(@"MMServiceCenter") defaultCenter] getService:NSClassFromString(@"WCRedEnvelopesControlMgr")];
-        if(isMySendMsg){
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                self.isHiddenRedEnvelopesReceiveView = YES;
-                [controlMgr startReceiveRedEnvelopesLogic:baseMsgVC Data:data];
-            });
-        } else {
-            self.isHiddenRedEnvelopesReceiveView = YES;
-            [controlMgr startReceiveRedEnvelopesLogic:baseMsgVC Data:data];
-        }
+        self.isHiddenRedEnvelopesReceiveView = YES;
+        [controlMgr startReceiveRedEnvelopesLogic:baseMsgVC Data:data];
     }
 }
 
@@ -361,7 +364,7 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
 
 //获取虚拟位置
 - (CLLocation *)getVirutalLocationWithRealLocation:(CLLocation *)realLocation{
-    return _virtualLocation ? [[CLLocation alloc] initWithCoordinate:_virtualLocation.coordinate altitude:realLocation.altitude horizontalAccuracy: realLocation.horizontalAccuracy verticalAccuracy:realLocation.verticalAccuracy timestamp:realLocation.timestamp] : realLocation;
+    return _virtualLocation ? [[CLLocation alloc] initWithCoordinate:_virtualLocation.coordinate altitude:realLocation.altitude horizontalAccuracy: realLocation.horizontalAccuracy verticalAccuracy:realLocation.verticalAccuracy course:realLocation.course speed:realLocation.speed timestamp:realLocation.timestamp] : realLocation;
 }
 
 //处理运动步数
