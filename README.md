@@ -53,3 +53,9 @@ iOS版微信抢红包插件 tweak源文件
 
 如果觉得有用，欢迎star</br>
 如果使用发现问题，欢迎issue
+
+## 支持作者
+
+开发插件占用了我个人大量的私人时间，如果你觉得对你有所帮助，不妨请我喝杯☕️以鼓励我开发出更优秀的插件</br>
+![image](https://github.com/kevll/WeChatRedEnvelopesHelper/blob/master/screenshots/wechatpay.png) </br>
+![image](https://github.com/kevll/WeChatRedEnvelopesHelper/blob/master/screenshots/alipay.png)
