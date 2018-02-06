@@ -7,6 +7,7 @@
 //
 
 #import "LLRedEnvelopesMgr.h"
+#import <objc/runtime.h>
 
 #define kArchiverLocationFilePath [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0] stringByAppendingPathComponent:@"LLVirutalLocationPOIInfomation"]
 
@@ -29,6 +30,9 @@ static NSString * const autoLeaveMessageTextKey = @"autoLeaveMessageTextKey";
 static NSString * const openRedEnvelopesDelaySecondKey = @"openRedEnvelopesDelaySecondKey";
 static NSString * const wantSportStepCountKey = @"wantSportStepCountKey"; 
 static NSString * const filterRoomDicKey = @"filterRoomDicKey";
+
+static const char isHiddenRedEnvelopesReceiveViewKey;
+static const char logicControllerKey;
 
 @implementation LLRedEnvelopesMgr
 
@@ -77,24 +81,25 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
 }
 
 - (void)reset{
-    _haveNewRedEnvelopes = NO;
-    _isHiddenRedEnvelopesReceiveView = NO;
-    _isHongBaoPush = NO;
+    //_haveNewRedEnvelopes = NO;
+    //_isHiddenRedEnvelopesReceiveView = NO;
+    //_isHongBaoPush = NO;
+    self.logicController = nil;
 }
 
 #pragma mark SET GET METHOD
 
-- (void)setHaveNewRedEnvelopes:(BOOL)haveNewRedEnvelopes{
-    _haveNewRedEnvelopes = haveNewRedEnvelopes;
-}
+//- (void)setHaveNewRedEnvelopes:(BOOL)haveNewRedEnvelopes{
+//    _haveNewRedEnvelopes = haveNewRedEnvelopes;
+//}
 
-- (void)setIsHongBaoPush:(BOOL)isHongBaoPush{
-    _isHongBaoPush = isHongBaoPush;
-}
+//- (void)setIsHongBaoPush:(BOOL)isHongBaoPush{
+//    _isHongBaoPush = isHongBaoPush;
+//}
 
-- (void)setIsHiddenRedEnvelopesReceiveView:(BOOL)isHiddenRedEnvelopesReceiveView{
-    _isHiddenRedEnvelopesReceiveView = isHiddenRedEnvelopesReceiveView;
-}
+//- (void)setIsHiddenRedEnvelopesReceiveView:(BOOL)isHiddenRedEnvelopesReceiveView{
+//    _isHiddenRedEnvelopesReceiveView = isHiddenRedEnvelopesReceiveView;
+//}
 
 - (void)setBgTaskIdentifier:(UIBackgroundTaskIdentifier)bgTaskIdentifier{
     _bgTaskIdentifier = bgTaskIdentifier;
@@ -104,8 +109,24 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
     _bgTaskTimer = bgTaskTimer;
 }
 
-- (void)setOpenRedEnvelopesBlock:(void (^)(void))openRedEnvelopesBlock{
-    _openRedEnvelopesBlock = [openRedEnvelopesBlock copy];
+//- (void)setOpenRedEnvelopesBlock:(void (^)(void))openRedEnvelopesBlock{
+//    _openRedEnvelopesBlock = [openRedEnvelopesBlock copy];
+//}
+
+- (BOOL)isHiddenRedEnvelopesReceiveView:(id)object{
+    return [objc_getAssociatedObject(object, &isHiddenRedEnvelopesReceiveViewKey) boolValue];
+}
+
+- (void)setIsHiddenRedEnvelopesReceiveView:(id)object value:(BOOL)value{
+    objc_setAssociatedObject(object, &isHiddenRedEnvelopesReceiveViewKey, @(value), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)removeIsHiddenRedEnvelopesReceiveView:(id)object{
+    objc_removeAssociatedObjects(object);
+}
+
+- (id)logicController:(id)object{
+    return objc_getAssociatedObject(object, &logicControllerKey);
 }
 
 //保存用户设置
@@ -192,10 +213,11 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
         //红包消息
         self.lastMsgWrap = self.msgWrap;
         self.msgWrap = msgWrap;
-        self.haveNewRedEnvelopes = YES;
-        if(isBackground && self.openRedEnvelopesBlock){
-            self.openRedEnvelopesBlock();
-        }
+        //self.haveNewRedEnvelopes = YES;
+        //if(isBackground){
+            //self.openRedEnvelopesBlock();
+            [self openRedEnvelopes];
+        //}
     }
 }
 
@@ -218,6 +240,9 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
     }
     if(appMsgInnerType != 0x7d1 || msgWrap.m_oWCPayInfoItem.m_sceneId != 0x3ea){
         return NO;
+    }
+    if(msgWrap == self.lastMsgWrap){
+        return NO; //过滤重复红包消息
     }
     if(!((msgWrap.m_n64MesSvrID == 0 && msgWrap.m_oWCPayInfoItem.m_nsPayMsgID != self.lastMsgWrap.m_oWCPayInfoItem.m_nsPayMsgID) || msgWrap.m_n64MesSvrID != self.lastMsgWrap.m_n64MesSvrID)){
         return NO; //过滤领取红包消息
@@ -242,29 +267,47 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
 
 #pragma mark HANDLER METHOD
 
-- (void)openRedEnvelopes:(NewMainFrameViewController *)mainVC{
+- (void)openRedEnvelopes{
+    NewMainFrameViewController *mainVC = [[NSClassFromString(@"CAppViewControllerManager") getAppViewControllerManager] getNewMainFrameViewController];
     NSArray *controllers = mainVC.navigationController.viewControllers;
-    UIViewController *msgContentVC = nil;
+    BaseMsgContentViewController *msgContentVC = nil;
     for (UIViewController *aController in controllers) {
         if ([aController isMemberOfClass:NSClassFromString(@"BaseMsgContentViewController")]) {
-            msgContentVC = aController;
+            msgContentVC = (BaseMsgContentViewController *)aController;
             break;
         }
     }
-    if (msgContentVC) {
-        [mainVC.navigationController PushViewController:msgContentVC animated:YES];
+    CContactMgr *contactMgr = [[NSClassFromString(@"MMServiceCenter") defaultCenter] getService:NSClassFromString(@"CContactMgr")];
+    CContact *fromContact = [contactMgr getContactByName:self.msgWrap.m_nsFromUsr];
+    BOOL isMySendMsg = [self isMySendMsgWithMsgWrap:self.msgWrap];
+    BaseMsgContentViewController *baseMsgVC = nil;
+    if(!isMySendMsg && ![[msgContentVC getChatContact] isEqualToContact:fromContact]){
+        BaseMsgContentLogicController *logicController = [[NSClassFromString(@"BaseMsgContentLogicController") alloc] initWithLocalID:self.msgWrap.m_uiMesLocalID CreateTime:self.msgWrap.m_uiCreateTime ContentViewDisshowStatus:0x4];
+        [logicController setM_contact:fromContact];
+        [logicController setM_dicExtraInfo:nil];
+        [logicController onWillEnterRoom];
+        objc_setAssociatedObject(self.msgWrap,&logicControllerKey,logicController,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        //self.logicController = logicController;
+        //MMMsgLogicManager *logicMgr = [[NSClassFromString(@"MMServiceCenter") defaultCenter] getService:NSClassFromString(@"MMMsgLogicManager")];
+        //[logicMgr PushLogicController:logicController navigationController:mainVC.navigationController animated:NO];
+        baseMsgVC = [logicController getMsgContentViewController];
     } else {
-        [mainVC tableView:[mainVC valueForKey:@"m_tableView"] didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:1]];
+        //self.logicController = nil;
+        baseMsgVC = msgContentVC;
     }
+    [self handleRedEnvelopesPushVC:baseMsgVC];
+    //if (msgContentVC) {
+    //    [mainVC.navigationController PushViewController:msgContentVC animated:YES];
+    //} else {
+    //    [mainVC tableView:[mainVC valueForKey:@"m_tableView"] didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:1]];
+    //}
 }
 
 - (void)handleRedEnvelopesPushVC:(BaseMsgContentViewController *)baseMsgVC{
     //红包push
     if(![[self.msgWrap nativeUrl] containsString:@"weixin://openNativeUrl/weixinHB/startreceivebizhbrequest?"]){
-        CContactMgr *contactMgr = [[NSClassFromString(@"MMServiceCenter") defaultCenter] getService:NSClassFromString(@"CContactMgr")];
-        CContact *fromContact = [contactMgr getContactByName:self.msgWrap.m_nsFromUsr];
-        BOOL isMySendMsg = [self isMySendMsgWithMsgWrap:self.msgWrap];
-        if(!isMySendMsg && ![[baseMsgVC getChatContact] isEqualToContact:fromContact]){
+        
+        /*if(!isMySendMsg && ![[baseMsgVC getChatContact] isEqualToContact:fromContact]){
             BaseMsgContentLogicController *logicController = [[NSClassFromString(@"BaseMsgContentLogicController") alloc] initWithLocalID:self.msgWrap.m_uiMesLocalID CreateTime:self.msgWrap.m_uiCreateTime ContentViewDisshowStatus:0x4];
             [logicController setM_contact:fromContact];
             [logicController setM_dicExtraInfo:nil];
@@ -273,11 +316,12 @@ static NSString * const filterRoomDicKey = @"filterRoomDicKey";
             baseMsgVC = [logicController getMsgContentViewController];
         } else {
             self.logicController = nil;
-        }
+        }*/
         WCRedEnvelopesControlData *data = [[NSClassFromString(@"WCRedEnvelopesControlData") alloc] init];
         [data setM_oSelectedMessageWrap:self.msgWrap];
         WCRedEnvelopesControlMgr *controlMgr = [[NSClassFromString(@"MMServiceCenter") defaultCenter] getService:NSClassFromString(@"WCRedEnvelopesControlMgr")];
-        self.isHiddenRedEnvelopesReceiveView = YES;
+        //self.isHiddenRedEnvelopesReceiveView = YES;
+        [self setIsHiddenRedEnvelopesReceiveView:self.msgWrap value:YES];
         [controlMgr startReceiveRedEnvelopesLogic:baseMsgVC Data:data];
     }
 }

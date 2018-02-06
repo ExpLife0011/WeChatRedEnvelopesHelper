@@ -15,9 +15,9 @@
 
 @interface LLRedEnvelopesMgr : NSObject
 
-@property (nonatomic, assign) BOOL haveNewRedEnvelopes; //是否有新的红包
-@property (nonatomic, assign) BOOL isHiddenRedEnvelopesReceiveView; //是否隐藏红包接受页面
-@property (nonatomic, assign) BOOL isHongBaoPush; //是否是红包push
+//@property (nonatomic, assign) BOOL haveNewRedEnvelopes; //是否有新的红包
+//@property (nonatomic, assign) BOOL isHiddenRedEnvelopesReceiveView; //是否隐藏红包接受页面
+//@property (nonatomic, assign) BOOL isHongBaoPush; //是否是红包push
 @property (nonatomic, assign) BOOL isOpenRedEnvelopesHelper; //是否开启红包助手
 @property (nonatomic, assign) BOOL isOpenSportHelper; //是否开启步数助手
 @property (nonatomic, assign) BOOL isOpenBackgroundMode; //是否开启后台模式
@@ -45,9 +45,14 @@
 @property (nonatomic, strong) NSMutableDictionary *filterRoomDic; //过滤群组字典
 @property (nonatomic, strong) POIInfo *virtualLocation; //虚拟位置POIInfo
 
-@property (nonatomic, copy) void(^openRedEnvelopesBlock)(void); //打开红包block
+//@property (nonatomic, copy) void(^openRedEnvelopesBlock)(void); //打开红包block
 
 + (LLRedEnvelopesMgr *)shared;
+
+- (BOOL)isHiddenRedEnvelopesReceiveView:(id)object;
+- (void)setIsHiddenRedEnvelopesReceiveView:(id)object value:(BOOL)value;
+- (void)removeIsHiddenRedEnvelopesReceiveView:(id)object;
+- (id)logicController:(id)object;
 
 - (void)reset;
 
@@ -63,7 +68,7 @@
 //判断是否抢红包
 - (BOOL)isSnatchRedEnvelopes:(CMessageWrap *)msgWrap;
 
-- (void)openRedEnvelopes:(NewMainFrameViewController *)mainVC;
+- (void)openRedEnvelopes;
 
 - (void)handleRedEnvelopesPushVC:(BaseMsgContentViewController *)baseMsgVC;
 

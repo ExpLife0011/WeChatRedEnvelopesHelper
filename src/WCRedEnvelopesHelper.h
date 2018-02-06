@@ -55,6 +55,23 @@
 
 @end 
 
+@interface BaseChatViewModel : NSObject
+
+@property(readonly, nonatomic) CMessageWrap *messageWrap;
+@property(retain, nonatomic) CBaseContact *chatContact; // @synthesize chatContact=m_chatContact;
+//@property(nonatomic,weak) id <ChatViewModelDelegate> delegate; // @synthesize delegate=_delegate;
+
+- (id)cellDataForRow:(unsigned long long)arg1;
+
+@end
+
+@interface BaseChatCellView : UIView
+
+@property(readonly, nonatomic) BaseChatViewModel *viewModel; // @synthesize viewModel=m_viewModel;
+//@property(nonatomic,weak) id <MessageNodeViewDelegate> delegate; // @synthesize delegate=m_delegate;
+
+@end
+
 @interface UIViewController (ModalView)
 
 - (void)PresentModalViewController:(id)arg1 animated:(_Bool)arg2;
@@ -262,7 +279,15 @@
 
 @interface CAppViewControllerManager: NSObject
 
++ (id)topViewControllerOfWindow:(id)arg1;
++ (id)topViewControllerOfMainWindow;
++ (id)topMostController;
++ (id)getCurrentNavigationController;
 + (UITabBarController *)getTabBarController;
++ (CAppViewControllerManager *)getAppViewControllerManager;
++ (_Bool)hasEnterWechatMain;
+
+- (NewMainFrameViewController *)getNewMainFrameViewController;
 
 @end
 
@@ -297,5 +322,11 @@
 - (id)initWithScene:(unsigned int)arg1 OnlyUseUserLocation:(_Bool)arg2;
 - (id)getCurrentPOIInfo;
 - (void)reportOnDone;
+
+@end
+
+@interface MMMsgLogicManager: NSObject
+
+- (void)PushLogicController:(id)logic navigationController:(id)navigation animated:(BOOL)animated;
 
 @end
