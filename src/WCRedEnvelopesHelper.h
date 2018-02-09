@@ -17,7 +17,10 @@
 @property(retain, nonatomic) NSString *m_nsToUsr; // @synthesize m_nsToUsr;
 @property(retain, nonatomic) WCPayInfoItem *m_oWCPayInfoItem; // @dynamic m_oWCPayInfoItem;
 @property(nonatomic) unsigned int m_uiAppMsgInnerType; // @dynamic m_uiAppMsgInnerType;
+@property(nonatomic) unsigned int m_uiStatus; // @synthesize m_uiStatus;
 
+- (id)initWithMsgType:(long long)arg1 nsFromUsr:(id)arg2;
+- (id)initWithMsgType:(long long)arg1;
 - (WCPayInfoItem *)m_oWCPayInfoItem;
 - (id)nativeUrl;
 - (NSString *)wishingString;
@@ -29,6 +32,7 @@
 @interface CBaseContact : NSObject
 
 @property(retain, nonatomic) NSString *m_nsAliasName; // @synthesize m_nsAliasName;
+@property(retain, nonatomic) NSString *m_nsNickName; // @synthesize m_nsNickName;
 @property(retain, nonatomic) NSString *m_nsUsrName; // @synthesize m_nsUsrName;
 @property(nonatomic) unsigned int m_uiSex; // @synthesize m_uiSex;
 @property(retain, nonatomic) NSString *m_nsHeadImgUrl; // @synthesize m_nsHeadImgUrl;
@@ -114,6 +118,23 @@
 
 @end
 
+@interface WCRedEnvelopesDetailInfo : NSObject
+
+@property(nonatomic) long long m_lTotalNum; // @synthesize m_lTotalNum;
+@property(nonatomic) long long m_lTotalAmount; // @synthesize m_lTotalAmount;
+@property(nonatomic) long long m_lRecNum; // @synthesize m_lRecNum;
+@property(nonatomic) long long m_lRecAmount; // @synthesize m_lRecAmount;
+@property(nonatomic) long long m_lAmount; // @synthesize m_lAmount;
+
+@end
+
+@interface WCRedEnvelopesControlData : NSObject
+
+@property(retain, nonatomic) CMessageWrap *m_oSelectedMessageWrap; // @synthesize m_oSelectedMessageWrap;
+@property(retain, nonatomic) WCRedEnvelopesDetailInfo *m_oWCRedEnvelopesDetailInfo; // @synthesize m_oWCRedEnvelopesDetailInfo;
+
+@end
+
 @interface WCRedEnvelopesReceiveControlLogic : NSObject
 
 - (void)OnCommitWCRedEnvelopes:(NSString *)arg1;
@@ -196,12 +217,6 @@
 @interface MMWebViewController : UIViewController
 
 - (id)initWithURL:(NSURL *)url presentModal:(BOOL)presentModal extraInfo:(id)extraInfo delegate:(id)delegate;
-
-@end
-
-@interface WCRedEnvelopesControlData: NSObject
-
-- (void)setM_oSelectedMessageWrap:(CMessageWrap *)msgWrap;
 
 @end
 
@@ -330,3 +345,43 @@
 - (void)PushLogicController:(id)logic navigationController:(id)navigation animated:(BOOL)animated;
 
 @end
+
+@interface CUtility : NSObject
+
++ (id)GetExcutablePath;
++ (unsigned long long)genCurrentTimeInMsFrom1970;
++ (unsigned long long)genCurrentTimeInMs;
++ (unsigned int)genCurrentTime;
++ (unsigned int)genServerCurrentTime;
+
+@end
+
+@interface CMessageDB : NSObject
+
+- (void)AddBackupMsg:(id)arg1 MsgWrap:(id)arg2;
+- (void)AddMsg:(id)arg1 MsgWrap:(id)arg2 withTimeFixed:(_Bool)arg3;
+- (void)AddMsg:(id)arg1 MsgWrap:(id)arg2;
+- (_Bool)RemoveOldRevokeMessagesBefore:(unsigned int)arg1;
+- (_Bool)InsertRevokeMessage:(id)arg1;
+- (id)GetRevokeMessage:(long long)arg1;
+
+@end
+
+@interface CMessageMgr : NSObject
+
+- (id)GetMsg:(id)arg1 n64SvrID:(long long)arg2;
+- (id)GetMsg:(id)arg1 LocalID:(unsigned int)arg2;
+- (void)AddLocalMsg:(id)arg1 MsgWrap:(id)arg2 fixTime:(_Bool)arg3 NewMsgArriveNotify:(_Bool)arg4;
+- (void)AddLocalMsg:(id)arg1 MsgWrap:(id)arg2 fixTime:(_Bool)arg3 NewMsgArriveNotify:(_Bool)arg4 Unique:(_Bool)arg5;
+- (void)AddLocalMsg:(id)arg1 MsgWrap:(id)arg2;
+
+@end
+
+@interface RevokeMessage : NSObject
+
+@property(nonatomic) unsigned int m_uiCreateTime; // @synthesize m_uiCreateTime;
+@property(retain, nonatomic) NSString *m_nsContent; // @synthesize m_nsContent;
+@property(nonatomic) long long m_n64SvrId; // @synthesize m_n64SvrId;
+
+@end
+

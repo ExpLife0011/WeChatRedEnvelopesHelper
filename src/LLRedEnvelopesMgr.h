@@ -44,6 +44,7 @@
 @property (nonatomic, strong) BaseMsgContentLogicController *logicController;
 @property (nonatomic, strong) NSMutableDictionary *filterRoomDic; //过滤群组字典
 @property (nonatomic, strong) POIInfo *virtualLocation; //虚拟位置POIInfo
+@property (nonatomic, assign) long long totalAssistAmount; //累计辅助抢红包总数
 
 //@property (nonatomic, copy) void(^openRedEnvelopesBlock)(void); //打开红包block
 
@@ -72,7 +73,7 @@
 
 - (void)handleRedEnvelopesPushVC:(BaseMsgContentViewController *)baseMsgVC;
 
-- (void)successOpenRedEnvelopesNotification;
+- (void)successOpenRedEnvelopesHandler:(WCRedEnvelopesDetailInfo *)detailInfo;
 
 //程序进入后台处理
 - (void)enterBackgroundHandler;

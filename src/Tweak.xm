@@ -1,6 +1,6 @@
 #import "WCRedEnvelopesHelper.h"
 #import "LLRedEnvelopesMgr.h"
-#import "LLSettingController.h"
+#import "LLSettingEntryController.h"
 #import <AVFoundation/AVFoundation.h>
 %hook WCDeviceStepObject
 
@@ -89,6 +89,23 @@
 
 %end
 
+%hook WCRedEnvelopesReceiveControlLogic
+
+- (void)OnOpenRedEnvelopesRequest:(id)request Error:(id)error{
+	%orig;
+	if(![LLRedEnvelopesMgr shared].isOpenRedEnvelopesHelper){
+		return;
+	}
+	WCRedEnvelopesControlData *m_data = MSHookIvar<WCRedEnvelopesControlData *>(self,"m_data");
+	CMessageWrap *m_oSelectedMessageWrap = m_data.m_oSelectedMessageWrap;
+	if([[LLRedEnvelopesMgr shared] isHiddenRedEnvelopesReceiveView:m_oSelectedMessageWrap]){
+		WCRedEnvelopesDetailInfo *detailInfo = m_data.m_oWCRedEnvelopesDetailInfo;
+  		[[LLRedEnvelopesMgr shared] successOpenRedEnvelopesHandler:detailInfo];
+	}
+}
+
+%end
+
 %hook WCRedEnvelopesReceiveHomeView
 
 - (id)initWithFrame:(CGRect)frame andData:(id)data delegate:(id)delegate{
@@ -101,13 +118,6 @@
 	    view.hidden = YES;
 	}
     return view;
-}
-
-- (void)showSuccessOpenAnimation{
-	%orig;
-	if ([LLRedEnvelopesMgr shared].isOpenRedEnvelopesHelper && [UIApplication sharedApplication].applicationState == UIApplicationStateBackground){ 
-		[[LLRedEnvelopesMgr shared] successOpenRedEnvelopesNotification];
-	}
 }
 
 %end 
@@ -199,8 +209,8 @@
 
 %new
 - (void)configHandler{
-    LLSettingController *settingVC = [[LLSettingController alloc] init];
-    [((UIViewController *)self).navigationController PushViewController:settingVC animated:YES];
+    LLSettingEntryController *settingEntryVC = [[LLSettingEntryController alloc] init];
+    [((UIViewController *)self).navigationController PushViewController:settingEntryVC animated:YES];
 }
 
 %end

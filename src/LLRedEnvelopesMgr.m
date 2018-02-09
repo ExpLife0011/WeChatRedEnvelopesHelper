@@ -30,6 +30,7 @@ static NSString * const autoLeaveMessageTextKey = @"autoLeaveMessageTextKey";
 static NSString * const openRedEnvelopesDelaySecondKey = @"openRedEnvelopesDelaySecondKey";
 static NSString * const wantSportStepCountKey = @"wantSportStepCountKey"; 
 static NSString * const filterRoomDicKey = @"filterRoomDicKey";
+static NSString * const totalAssistAmountKey = @"totalAssistAmountKey";
 
 static const char isHiddenRedEnvelopesReceiveViewKey;
 static const char logicControllerKey;
@@ -67,6 +68,7 @@ static const char logicControllerKey;
         _openRedEnvelopesDelaySecond = [userDefaults floatForKey:openRedEnvelopesDelaySecondKey];
         _wantSportStepCount = [userDefaults integerForKey:wantSportStepCountKey];
         _filterRoomDic = [userDefaults objectForKey:filterRoomDicKey];
+        _totalAssistAmount = [userDefaults integerForKey:totalAssistAmountKey];
 
         NSData *data = [NSData dataWithContentsOfFile:kArchiverLocationFilePath];
         if(data){
@@ -151,6 +153,7 @@ static const char logicControllerKey;
     [userDefaults setFloat:_openRedEnvelopesDelaySecond forKey:openRedEnvelopesDelaySecondKey];
     [userDefaults setInteger:_wantSportStepCount forKey:wantSportStepCountKey];
     [userDefaults setObject:_filterRoomDic forKey:filterRoomDicKey];
+    [userDefaults setInteger:_totalAssistAmount forKey:totalAssistAmountKey];
     [userDefaults synchronize];
 }
 /*
@@ -326,10 +329,11 @@ static const char logicControllerKey;
     }
 }
 
-- (void)successOpenRedEnvelopesNotification{
+- (void)successOpenRedEnvelopesHandler:(WCRedEnvelopesDetailInfo *)detailInfo{
+    long long m_lAmount = detailInfo.m_lAmount;
     if(self.isOpenRedEnvelopesAlert){
         UILocalNotification *localNotification = [[UILocalNotification alloc] init];
-        localNotification.alertBody = @"帮您领了一个大红包！快去查看吧~";
+        localNotification.alertBody = [NSString stringWithFormat:@"帮您领了%.2f元红包！快去查看吧~",m_lAmount / 100.0f];
         localNotification.soundName = UILocalNotificationDefaultSoundName;
         [[UIApplication sharedApplication] presentLocalNotificationNow:localNotification];
         [self playCashReceivedAudio];
