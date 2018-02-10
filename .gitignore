@@ -1,2 +1,12 @@
-# Mac OS X Finder and whatnot
+### macOS ###
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+### THEOS-Tweak ###
+*.deb
+.debmake
+_
+obj
+.theos
 .DS_Store
