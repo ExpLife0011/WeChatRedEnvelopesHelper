@@ -54,3 +54,13 @@
 }
 
 %end
+
+%hook TypingController
+
+- (void)trySendTyping:(NSString *)arg{
+	if(![LLRedEnvelopesMgr shared].isOpenBlockSendInputStatus){
+		%orig;
+	}
+}
+
+%end

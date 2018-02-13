@@ -62,6 +62,7 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     _settingParam.wantSportStepCount = manager.wantSportStepCount;
     _settingParam.filterRoomDic = manager.filterRoomDic;
     _settingParam.virtualLocation = manager.virtualLocation;
+    _settingParam.isOpenBlockSendInputStatus = manager.isOpenBlockSendInputStatus;
 
     _contactsDataLogic = [[NSClassFromString(@"ContactsDataLogic") alloc] initWithScene:0x0 delegate:nil sort:0x1 extendChatRoom:0x0];
 
@@ -163,10 +164,12 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     }
 
     MMTableViewCellInfo *openAvoidRevokeMessageCell = [NSClassFromString(@"MMTableViewCellInfo") switchCellForSel:@selector(openAvoidRevokeMessageSwitchHandler:) target:self title:@"是否防好友撤回消息" on:_settingParam.isOpenAvoidRevokeMessage];
+    MMTableViewCellInfo *openBlockSendInputStatusCell = [NSClassFromString(@"MMTableViewCellInfo") switchCellForSel:@selector(openBlockSendInputStatusSwitchHandler:) target:self title:@"阻止发送正在输入" on:_settingParam.isOpenBlockSendInputStatus];
 
     MMTableViewSectionInfo *revokeMessageSection = [NSClassFromString(@"MMTableViewSectionInfo") sectionInfoDefaut];
     [revokeMessageSection setHeaderView:[[UIView alloc] initWithFrame:CGRectMake(0,0,0,20)]];
     [revokeMessageSection addCell:openAvoidRevokeMessageCell];
+    [revokeMessageSection addCell:openBlockSendInputStatusCell];
 
     MMTableViewCellInfo *githubCell = [NSClassFromString(@"MMTableViewCellInfo") normalCellForSel:@selector(onGithubCellClicked) target:self title:@"我的Github" rightValue:@"欢迎Star" accessoryType:1];
 
@@ -202,6 +205,7 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
     manager.keywordFilterText = _settingParam.keywordFilterText;
     manager.isSnatchSelfRedEnvelopes = _settingParam.isSnatchSelfRedEnvelopes;
     manager.isOpenAvoidRevokeMessage = _settingParam.isOpenAvoidRevokeMessage;
+    manager.isOpenBlockSendInputStatus = _settingParam.isOpenBlockSendInputStatus;
     manager.sportStepCountMode = _settingParam.sportStepCountMode;
     manager.sportStepCountUpperLimit = _settingParam.sportStepCountUpperLimit;
     manager.sportStepCountLowerLimit = _settingParam.sportStepCountLowerLimit;
@@ -291,6 +295,10 @@ static NSString * const kSettingControllerKey = @"SettingControllerKey";
 
 - (void)openAvoidRevokeMessageSwitchHandler:(UISwitch *)openSwitch{
     _settingParam.isOpenAvoidRevokeMessage = openSwitch.on;
+}
+
+- (void)openBlockSendInputStatusSwitchHandler:(UISwitch *)openSwitch{
+    _settingParam.isOpenBlockSendInputStatus = openSwitch.on;
 }
 
 - (void)onGithubCellClicked{

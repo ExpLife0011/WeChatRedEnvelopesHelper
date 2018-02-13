@@ -1,4 +1,8 @@
-THEOS_DEVICE_IP = 192.168.5.2
+THEOS_DEVICE_IP = 192.168.5.25
+
+DEBUG = 0
+
+ARCHS = armv7 armv7s arm64
 
 include $(THEOS)/makefiles/common.mk
 
