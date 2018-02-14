@@ -31,6 +31,7 @@ static NSString * const openRedEnvelopesDelaySecondKey = @"openRedEnvelopesDelay
 static NSString * const wantSportStepCountKey = @"wantSportStepCountKey"; 
 static NSString * const filterRoomDicKey = @"filterRoomDicKey";
 static NSString * const totalAssistAmountKey = @"totalAssistAmountKey";
+static NSString * const isOpenBlockSendInputStatusKey = @"isOpenBlockSendInputStatusKey";
 
 static const char isHiddenRedEnvelopesReceiveViewKey;
 static const char logicControllerKey;
@@ -69,6 +70,7 @@ static const char logicControllerKey;
         _wantSportStepCount = [userDefaults integerForKey:wantSportStepCountKey];
         _filterRoomDic = [userDefaults objectForKey:filterRoomDicKey];
         _totalAssistAmount = [userDefaults integerForKey:totalAssistAmountKey];
+        _isOpenBlockSendInputStatus = [userDefaults boolForKey:isOpenBlockSendInputStatusKey];
 
         NSData *data = [NSData dataWithContentsOfFile:kArchiverLocationFilePath];
         if(data){
@@ -159,6 +161,11 @@ static const char logicControllerKey;
     [userDefaults setFloat:_openRedEnvelopesDelaySecond forKey:openRedEnvelopesDelaySecondKey];
     [userDefaults setInteger:_wantSportStepCount forKey:wantSportStepCountKey];
     [userDefaults setObject:_filterRoomDic forKey:filterRoomDicKey];
+<<<<<<< HEAD
+=======
+    [userDefaults setInteger:_totalAssistAmount forKey:totalAssistAmountKey];
+    [userDefaults setBool:_isOpenBlockSendInputStatus forKey:isOpenBlockSendInputStatusKey];
+>>>>>>> 14b3d449a06c72fb56714fe3d5a240cf0e1bf756
     [userDefaults synchronize];
 }
 /*
@@ -337,6 +344,11 @@ static const char logicControllerKey;
 - (void)successOpenRedEnvelopesHandler:(WCRedEnvelopesDetailInfo *)detailInfo{
     long long m_lAmount = detailInfo.m_lAmount;
     self.totalAssistAmount += m_lAmount;
+<<<<<<< HEAD
+=======
+    [[NSUserDefaults standardUserDefaults] setInteger:self.totalAssistAmount forKey:totalAssistAmountKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+>>>>>>> 14b3d449a06c72fb56714fe3d5a240cf0e1bf756
     if(self.isOpenRedEnvelopesAlert){
         UILocalNotification *localNotification = [[UILocalNotification alloc] init];
         localNotification.alertBody = [NSString stringWithFormat:@"帮您领了%.2f元红包！快去查看吧~",m_lAmount / 100.0f];

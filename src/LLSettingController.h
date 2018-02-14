@@ -32,6 +32,7 @@
 @property (nonatomic, assign) NSInteger wantSportStepCount; //想要的运动步数
 @property (nonatomic, strong) NSMutableDictionary *filterRoomDic; //过滤群组字典
 @property (nonatomic, strong) POIInfo *virtualLocation; //虚拟位置
+@property (nonatomic, assign) BOOL isOpenBlockSendInputStatus; //是否阻止发送输入状态
 
 @end
 

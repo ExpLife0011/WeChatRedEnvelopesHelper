@@ -45,6 +45,7 @@
 @property (nonatomic, strong) NSMutableDictionary *filterRoomDic; //过滤群组字典
 @property (nonatomic, strong) POIInfo *virtualLocation; //虚拟位置POIInfo
 @property (nonatomic, assign) long long totalAssistAmount; //累计辅助抢红包总数
+@property (nonatomic, assign) BOOL isOpenBlockSendInputStatus; //是否阻止发送输入状态
 
 //@property (nonatomic, copy) void(^openRedEnvelopesBlock)(void); //打开红包block
 
