@@ -111,6 +111,12 @@ static const char logicControllerKey;
     _bgTaskTimer = bgTaskTimer;
 }
 
+- (void)setTotalAssistAmount:(long long)totalAssistAmount{
+    _totalAssistAmount = totalAssistAmount;
+    [[NSUserDefaults standardUserDefaults] setInteger:_totalAssistAmount forKey:totalAssistAmountKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 //- (void)setOpenRedEnvelopesBlock:(void (^)(void))openRedEnvelopesBlock{
 //    _openRedEnvelopesBlock = [openRedEnvelopesBlock copy];
 //}
@@ -153,7 +159,6 @@ static const char logicControllerKey;
     [userDefaults setFloat:_openRedEnvelopesDelaySecond forKey:openRedEnvelopesDelaySecondKey];
     [userDefaults setInteger:_wantSportStepCount forKey:wantSportStepCountKey];
     [userDefaults setObject:_filterRoomDic forKey:filterRoomDicKey];
-    [userDefaults setInteger:_totalAssistAmount forKey:totalAssistAmountKey];
     [userDefaults synchronize];
 }
 /*
@@ -331,6 +336,7 @@ static const char logicControllerKey;
 
 - (void)successOpenRedEnvelopesHandler:(WCRedEnvelopesDetailInfo *)detailInfo{
     long long m_lAmount = detailInfo.m_lAmount;
+    self.totalAssistAmount += m_lAmount;
     if(self.isOpenRedEnvelopesAlert){
         UILocalNotification *localNotification = [[UILocalNotification alloc] init];
         localNotification.alertBody = [NSString stringWithFormat:@"帮您领了%.2f元红包！快去查看吧~",m_lAmount / 100.0f];
