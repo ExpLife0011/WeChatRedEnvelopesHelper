@@ -43,20 +43,12 @@
 
 - (void)reloadTableData{
     MMTableViewCellInfo *redEnvelopesCell = [NSClassFromString(@"MMTableViewCellInfo") normalCellForSel:@selector(onRedEnvelopesCellClicked) target:self title:@"微信助手设置" rightValue:nil accessoryType:1];
-<<<<<<< HEAD
-    MMTableViewCellInfo *totalAssistAmountCell = [NSClassFromString(@"MMTableViewCellInfo") normalCellForSel:nil target:self title:@"累计帮您领取红包" rightValue:[NSString stringWithFormat:@"%.2f元",[LLRedEnvelopesMgr shared].totalAssistAmount / 100.0f] accessoryType:0];
-=======
     MMTableViewCellInfo *assistAmountCell = [NSClassFromString(@"MMTableViewCellInfo") normalCellForSel:@selector(onAssistAmountCellClicked) target:self title:@"累计为你抢到" rightValue:[NSString stringWithFormat:@"%.2f元",[LLRedEnvelopesMgr shared].totalAssistAmount / 100.0f] accessoryType:1];
->>>>>>> 14b3d449a06c72fb56714fe3d5a240cf0e1bf756
 
     MMTableViewSectionInfo *wechatSection = [NSClassFromString(@"MMTableViewSectionInfo") sectionInfoDefaut];
     [wechatSection setHeaderView:[[UIView alloc] initWithFrame:CGRectMake(0,0,0,20)]];
     [wechatSection addCell:redEnvelopesCell];
-<<<<<<< HEAD
-    [wechatSection addCell:totalAssistAmountCell];
-=======
     [wechatSection addCell:assistAmountCell];
->>>>>>> 14b3d449a06c72fb56714fe3d5a240cf0e1bf756
 
     MMTableViewCellInfo *githubCell = [NSClassFromString(@"MMTableViewCellInfo") normalCellForSel:@selector(onGithubCellClicked) target:self title:@"我的Github" rightValue:@"欢迎⭐️" accessoryType:1];
     MMTableViewCellInfo *blogCell = [NSClassFromString(@"MMTableViewCellInfo") normalCellForSel:@selector(onBlogCellClicked) target:self title:@"我的博客" rightValue:nil accessoryType:1];
