@@ -1,11 +1,14 @@
 #import <CoreLocation/CoreLocation.h>
 
+@class CContact;
+
 @interface WCPayInfoItem: NSObject
 @property(nonatomic) unsigned int m_sceneId; // @synthesize m_sceneId;
 @property(nonatomic) unsigned int m_uiPaySubType; // @synthesize m_uiPaySubType;
 @property(retain, nonatomic) NSString *m_nsPayMsgID; // @synthesize m_nsPayMsgID;
 - (NSString *)m_nsPayMsgID;
 @end
+
 @interface CMessageWrap : NSObject
 
 @property(nonatomic) unsigned int m_uiMessageType; // @synthesize m_uiMessageType;
@@ -18,6 +21,14 @@
 @property(retain, nonatomic) WCPayInfoItem *m_oWCPayInfoItem; // @dynamic m_oWCPayInfoItem;
 @property(nonatomic) unsigned int m_uiAppMsgInnerType; // @dynamic m_uiAppMsgInnerType;
 @property(nonatomic) unsigned int m_uiStatus; // @synthesize m_uiStatus;
+@property(nonatomic) unsigned int m_dicStatParas;
+@property(nonatomic) unsigned int m_forwardType;
+@property(nonatomic) unsigned int m_uiDownloadStatus;
+@property(retain, nonatomic) id m_nsMsgSource;
+@property(retain, nonatomic) id m_dtVoice;
+@property(nonatomic) unsigned int m_uiVoiceFormat;
+@property(nonatomic) unsigned int m_uiVoiceTime;
+
 
 - (id)initWithMsgType:(long long)arg1 nsFromUsr:(id)arg2;
 - (id)initWithMsgType:(long long)arg1;
@@ -26,6 +37,10 @@
 - (NSString *)wishingString;
 - (BOOL)IsSendBySendMsg;
 + (BOOL)isSenderFromMsgWrap:(CMessageWrap *)msgWrap;
+- (NSString *)GetChatName;
+- (CMessageWrap *)GetMsg:(NSString *)arg1 LocalID:(NSString *)arg2;
+- (void)fillMsgSourceFromContact:(CContact *)arg1 isFromTempSession:(BOOL)arg2;
+- (void)UpdateContent:(id)arg1;
 
 @end
 
@@ -49,6 +64,9 @@
 
 - (id)getContactByName:(id)arg1;
 - (id)getSelfContact;
+- (CContact *)getContactForSearchByName:(NSString *)arg0;
+- (CContact *)getContactsFromServer:(NSArray *)arg0;
+- (void)addLocalContact:(CContact *)arg0 listType:(unsigned int)arg1;
 
 @end
 
@@ -167,6 +185,16 @@
 
 @end
 
+@interface MMTableViewSectionInfo : NSObject
+
++ (id)sectionInfoDefaut;
+- (void)addCell:(id)arg1;
+- (void)setHeaderView:(UIView *)headerView;
+- (void)setFHeaderHeight:(CGFloat)height;
+- (void)setFooterTitle:(NSString *)title;
+
+@end
+
 @interface MMTableViewInfo : NSObject
 
 - (void)setDelegate:(id)delegate;
@@ -176,15 +204,7 @@
 - (void)addSection:(id)arg1;
 - (void)insertSection:(id)arg1 At:(unsigned int)arg2;
 - (void)clearAllSection;
-
-@end
-
-@interface MMTableViewSectionInfo : NSObject
-
-+ (id)sectionInfoDefaut;
-- (void)addCell:(id)arg1;
-- (void)setHeaderView:(UIView *)headerView;
-- (void)setFHeaderHeight:(CGFloat)height;
+- (MMTableViewSectionInfo *)getSectionAt:(unsigned int)arg2;
 
 @end
 
@@ -353,6 +373,14 @@
 + (unsigned long long)genCurrentTimeInMs;
 + (unsigned int)genCurrentTime;
 + (unsigned int)genServerCurrentTime;
++ (NSString *)GetPathOfMesAudio:(NSString *)arg1 LocalID:(unsigned long)arg2 DocPath:(NSString *)arg3;
++ (NSString *)GetDocPath;
+
+@end
+
+@interface CBaseFile : NSObject
+
++ (BOOL)FileExist:(NSString *)arg1;
 
 @end
 
@@ -374,7 +402,7 @@
 - (void)AddLocalMsg:(id)arg1 MsgWrap:(id)arg2 fixTime:(_Bool)arg3 NewMsgArriveNotify:(_Bool)arg4;
 - (void)AddLocalMsg:(id)arg1 MsgWrap:(id)arg2 fixTime:(_Bool)arg3 NewMsgArriveNotify:(_Bool)arg4 Unique:(_Bool)arg5;
 - (void)AddLocalMsg:(id)arg1 MsgWrap:(id)arg2;
-
+- (void)AddMsg:(NSString *)to MsgWrap:(CMessageWrap *)msgWrap;
 @end
 
 @interface RevokeMessage : NSObject
@@ -385,3 +413,56 @@
 
 @end
 
+@interface ChatRoomInfoViewController : UIViewController
+
+@property (nonatomic, strong) CContact *m_chatRoomContact;
+
+@end
+
+@interface AddContactToChatRoomViewController : UIViewController
+
+@property (nonatomic, strong) CContact *m_contact;
+
+@end
+
+@interface SyncCmdHandler : NSObject
+
+@property (nonatomic, strong) NSMutableArray *m_arrMsgList;
+
+@end
+
+@interface MMNewUploadVoiceMgr : NSObject
+
+- (void)ResendVoiceMsg:(NSString *)toUser MsgWrap:(CMessageWrap *)msgWrap;
+
+@end
+
+@interface AudioSender : NSObject
+
+- (void)ResendVoiceMsg:(NSString *)toUser MsgWrap:(CMessageWrap *)msgWrap;
+
+@end
+
+@interface ForwardMsgUtil : NSObject
+
++ (CMessageWrap *)GenForwardMsgFromMsgWrap:(CMessageWrap *)msgWrap ToContact:(CContact *)contact;
+
+@end
+
+@interface MMNewSessionMgr : NSObject
+
+- (unsigned long)GenSendMsgTime;
+
+@end
+
+@interface WCTempChatMgr : NSObject
+
+- (BOOL)isTempChatForUserName:(NSString *)arg1;
+
+@end
+
+@interface ContactInfoViewController : UIViewController
+
+@property (nonatomic, strong) CContact *m_contact;
+
+@end

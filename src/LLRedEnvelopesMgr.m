@@ -85,25 +85,10 @@ static const char logicControllerKey;
 }
 
 - (void)reset{
-    //_haveNewRedEnvelopes = NO;
-    //_isHiddenRedEnvelopesReceiveView = NO;
-    //_isHongBaoPush = NO;
     self.logicController = nil;
 }
 
 #pragma mark SET GET METHOD
-
-//- (void)setHaveNewRedEnvelopes:(BOOL)haveNewRedEnvelopes{
-//    _haveNewRedEnvelopes = haveNewRedEnvelopes;
-//}
-
-//- (void)setIsHongBaoPush:(BOOL)isHongBaoPush{
-//    _isHongBaoPush = isHongBaoPush;
-//}
-
-//- (void)setIsHiddenRedEnvelopesReceiveView:(BOOL)isHiddenRedEnvelopesReceiveView{
-//    _isHiddenRedEnvelopesReceiveView = isHiddenRedEnvelopesReceiveView;
-//}
 
 - (void)setBgTaskIdentifier:(UIBackgroundTaskIdentifier)bgTaskIdentifier{
     _bgTaskIdentifier = bgTaskIdentifier;
@@ -118,10 +103,6 @@ static const char logicControllerKey;
     [[NSUserDefaults standardUserDefaults] setInteger:_totalAssistAmount forKey:totalAssistAmountKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
-
-//- (void)setOpenRedEnvelopesBlock:(void (^)(void))openRedEnvelopesBlock{
-//    _openRedEnvelopesBlock = [openRedEnvelopesBlock copy];
-//}
 
 - (BOOL)isHiddenRedEnvelopesReceiveView:(id)object{
     return [objc_getAssociatedObject(object, &isHiddenRedEnvelopesReceiveViewKey) boolValue];
@@ -165,59 +146,6 @@ static const char logicControllerKey;
     [userDefaults setBool:_isOpenBlockSendInputStatus forKey:isOpenBlockSendInputStatusKey];
     [userDefaults synchronize];
 }
-/*
-- (void)setIsOpenRedEnvelopesHelper:(BOOL)isOpenRedEnvelopesHelper{
-    _isOpenRedEnvelopesHelper = isOpenRedEnvelopesHelper;
-}
-
-- (void)setIsOpenSportHelper:(BOOL)isOpenSportHelper{
-    _isOpenSportHelper = isOpenSportHelper;
-}
-
-- (void)setIsOpenBackgroundMode:(BOOL)isOpenBackgroundMode{
-    _isOpenBackgroundMode = isOpenBackgroundMode;
-}
-
-- (void)setIsOpenRedEnvelopesAlert:(BOOL)isOpenRedEnvelopesAlert{
-    _isOpenRedEnvelopesAlert = isOpenRedEnvelopesAlert;
-}
-
-- (void)setIsOpenVirtualLocation:(BOOL)isOpenVirtualLocation{
-    _isOpenVirtualLocation = isOpenVirtualLocation;
-}
-
-- (void)setIsOpenAutoReply:(BOOL)isOpenAutoReply{
-    _isOpenAutoReply = isOpenAutoReply;
-}
-
-- (void)setIsOpenAutoLeaveMessage:(BOOL)isOpenAutoLeaveMessage{
-    _isOpenAutoLeaveMessage = isOpenAutoLeaveMessage;
-}
-
-- (void)setAutoReplyText:(NSString *)autoReplyText{
-    _autoReplyText = [autoReplyText copy];
-}
-
-- (void)setAutoLeaveMessageText:(NSString *)autoLeaveMessageText{
-    _autoLeaveMessageText = [autoLeaveMessageText copy];
-}
-
-- (void)setOpenRedEnvelopesDelaySecond:(CGFloat)openRedEnvelopesDelaySecond{
-    _openRedEnvelopesDelaySecond = openRedEnvelopesDelaySecond;
-}
-
-- (void)setWantSportStepCount:(NSInteger)wantSportStepCount{
-    _wantSportStepCount = wantSportStepCount;
-}
-
-- (void)setFilterRoomDic:(NSMutableDictionary *)filterRoomDic{
-    _filterRoomDic = filterRoomDic;
-}
-
-- (void)setVirtualLocation:(POIInfo *)virtualLocation{
-    _virtualLocation = [virtualLocation retain];
-}
-*/
 
 //处理微信消息,过滤红包消息
 - (void)handleMessageWithMessageWrap:(CMessageWrap *)msgWrap isBackground:(BOOL)isBackground{
@@ -412,7 +340,6 @@ static const char logicControllerKey;
         NSError *error = nil;
         [[NSFileManager defaultManager] removeItemAtPath:kArchiverLocationFilePath error:&error];
         if (error) {
-            //[self showMessage:[NSString stringWithFormat:@"%@",error] completion:nil];
             return;
         }
     }
