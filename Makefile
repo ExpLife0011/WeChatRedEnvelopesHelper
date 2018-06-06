@@ -1,6 +1,6 @@
 THEOS_DEVICE_IP = 192.168.2.2
 
-DEBUG = 1
+DEBUG = 0
 
 ARCHS = armv7 armv7s arm64
 

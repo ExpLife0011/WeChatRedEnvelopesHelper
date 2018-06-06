@@ -1,11 +1,10 @@
 ## WeChatRedEnvelopesHelper
 iOS版微信抢红包插件 tweak源文件
 
-## 关于新版本功能征集
-本人由于前一段时间工作比较忙，所以一直没能及时更新插件，很抱歉！
-近期会更新V2.2版本，将会增加一些新功能。欢迎大家提出一些实用的功能；
-可以直接提issue，或者给我发邮件；
-如果功能合理，我会考虑在新版本增加。
+## V2.2.0版本更新内容
+- 新增消息过滤功能，支持关键字过滤和全部屏蔽两种模式
+- 新增语音转发功能，语音一键转发
+- 拦截bundleId，降低被微信发现非法客户端问题(针对非越狱版本)
 
 ## V2.1.0版本更新内容
 - 防撤回功能增加友好提示
@@ -30,6 +29,8 @@ iOS版微信抢红包插件 tweak源文件
 - [x] 支持虚拟定位
 - [x] 支持好友消息防撤回
 - [x] 支持阻止发送正在输入，随时隐藏输入状态
+- [x] 支持过滤消息功能，关键字、全部屏蔽两种模式
+- [x] 支持语音一键转发
 
 ## ScreenShots
 - 微信在前台情况演示</br>
@@ -53,7 +54,7 @@ iOS版微信抢红包插件 tweak源文件
 
 - 非越狱手机
     1. 下载已打包好的ipa，使用[impactor](http://www.cydiaimpactor.com/)工具自行安装 （推荐）</br>
-        ipa百度网盘[下载链接](https://pan.baidu.com/s/1dnFW9C)  密码: 5dxs </br>
+        ipa百度网盘[下载链接](https://pan.baidu.com/s/1mRND_fPRN9w-eTSsKsKyQg)  密码: ugdi</br>
       ![image](https://github.com/kevll/WeChatRedEnvelopesHelper/blob/master/screenshots/stepone.gif)</br>
       ![image](https://github.com/kevll/WeChatRedEnvelopesHelper/blob/master/screenshots/steptwo.gif)</br>
     2. 从XX助手上面下载越狱版ipa --> 解压缩 --> 拷贝WeChatRedEnvelopesHelper.dylib和libsubstate.dylib到Frameworks目录 --> 向WeChat二进制文件注入dylib -> 更改 WeChatRedEnvelopesHelper.dylib 依赖 --> 打包重签名安装
